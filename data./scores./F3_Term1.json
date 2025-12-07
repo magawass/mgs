@@ -1,1 +1,23 @@
+[
+  {
+    "examNo": "M047/001",
+    "name": "ABRAHAM ALICE",
+    "subject": "English",
+    "class": "F3",
+    "term": "Term 2",
+    "score": 75,
+    "grade": 2,
+    "comments": "Shows strength in languages."
+  },
+  {
+    "examNo": "M047/001",
+    "name": "ABRAHAM ALICE",
+    "subject": "Mathematics",
+    "class": "F3",
+    "term": "Term 2",
+    "score": 55,
+    "grade": 5,
+    "comments": "Needs improvement in algebra."
+  }
+]
 
