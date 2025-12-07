@@ -1,1361 +1,752 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAGAWA SECONDARY SCHOOL - Results Portal</title>
-    <style>
-        /* Using standard, clean sans-serif font as requested (e.g., Arial, Helvetica) */
-        body {
-            font-family: Arial, Helvetica, Tahoma, Geneva, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-            color: #333;
-        }
-
-        /* Container for all pages, simulating a mobile/desktop responsive view */
-        #app-container {
-            max-width: 1200px;
-            margin: 20px auto;
-            border: 1px solid #ccc;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            min-height: 800px;
-        }
-
-        /* General Page Styling */
-        .page {
-            padding: 20px;
-            display: none; /* All pages are hidden by default */
-            min-height: 760px;
-        }
-
-        .centered {
-            text-align: center;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            background-color: #004d40; /* Placeholder color for logo */
-            margin: 0 auto 15px;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 10px;
-        }
-        
-        /* Ensure the img tag fits inside the logo container */
-        .logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 5px;
-        }
-
-        .title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 30px;
-        }
-
-        .control-group {
-            margin-bottom: 20px;
-        }
-
-        input[type="text"], input[type="password"], select, button, textarea {
-            font-family: Arial, Helvetica, Tahoma, Geneva, sans-serif;
-            padding: 10px;
-            margin: 5px 0;
-            width: 90%;
-            max-width: 300px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-        }
-
-        /* --- UPDATED BUTTON STYLING --- */
-        button {
-            /* Changed from #004d40 to professional blue/cyan */
-            background-color: #007AA5; 
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-            /* Added rounded corners */
-            border-radius: 8px; 
-        }
-
-        button:hover {
-            /* Changed from #00796b to a darker blue/cyan */
-            background-color: #005C8C; 
-        }
-        /* --- END UPDATED BUTTON STYLING --- */
-
-        .back-btn {
-            float: left;
-            margin-bottom: 10px;
-            width: 100px;
-            max-width: 100px;
-        }
-
-        .portal-btn {
-            width: 90%;
-            max-width: 400px;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-
-        /* Table Styling (For Score/Grade/Analysis Views) */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            table-layout: fixed; /* Helps columns fit */
-        }
-
-        th, td {
-            border: 1px solid black;
-            padding: 5px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
-        
-        /* ========================================================================================= */
-        /* --- NEW PROGRESS REPORT (#progressReport) STYLES (FROM Best ExApp Final.html) --- */
-        /* ========================================================================================= */
-        
-        #progressReport {
-            background-color: white;
-            color: black;
-            padding: 25px 10px 10px 10px; 
-            width: 794px; /* Fixed width for A4 simulation */
-            min-height: 1123px; /* Minimum height for A4 simulation */
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Add shadow to look like a separate page */
-            margin: 20px auto; /* Center the page horizontally on screen */
-            page-break-after: always; 
-            box-sizing: border-box;
-            position: relative;
-        }
-        
-        #progressReport header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-        
-        /* Adjusted .logo style specifically for the header, using the generic logo definition as base */
-        #progressReport header .logo {
-            width: 120px; 
-            height: 80px;
-            margin: 0 15px 0 0; 
-            background-color: #004d40; 
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 10px;
-        }
-        
-        #progressReport header .logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        #reportHeaderRight {
-            text-align: right;
-            font-size: 9pt;
-        }
-        
-        /* School Name Font Adjustment (Kept at 16pt as last requested) */
-        #reportHeaderRight h3 {
-            font-size: 16pt; 
-            margin: 0 0 5px 0;
-            font-weight: bold;
-        }
-        
-        /* PROGRESS REPORT title styling */
-        #progressReport h2 {
-            font-size: 14pt; 
-            font-weight: bold;
-        }
-
-        #reportDetails {
-            margin: 15px 0;
-            border-bottom: 1px solid black;
-            padding-bottom: 10px;
-            font-size: 10pt; /* For student info lines */
-        }
-
-        #reportDetails div {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
-        }
-
-        /* Results Table */
-        #resultsTable {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 9pt;
-        }
-
-        #resultsTable th, #resultsTable td {
-            border: 1px solid black;
-            padding: 5px;
-            text-align: left; 
-            background-color: white; 
-        }
-
-        #resultsTable th {
-            background-color: #eee; 
-            text-align: center; /* Ensure table headers are centered */
-            font-weight: bold;
-        }
-        
-        /* Column Width Optimization for 11 Subjects: Total = 100% */
-        #resultsTable thead tr th:nth-child(1) { width: 23%; } /* SUBJECT (23%) */
-        #resultsTable thead tr th:nth-child(2) { width: 8%; }  /* SCORE (8%) */
-        #resultsTable thead tr th:nth-child(3) { width: 8%; }  /* GRADE (8%) */
-        #resultsTable thead tr th:nth-child(4) { width: 12%; } /* POSITION (12%) */
-        #resultsTable thead tr th:nth-child(5) { width: 30%; } /* REMARKS (30%) */
-        #resultsTable thead tr th:nth-child(6) { width: 19%; } /* TEACHER (19%) */
-
-
-        /* Grade Key Table */
-        #gradeKeyTable {
-            width: 100%; 
-            border-collapse: collapse;
-            font-size: 9pt;
-            /* Remove outer border here, let the placeholder div handle it */
-        }
-        #gradeKeyTable th, #gradeKeyTable td {
-            border: 1px solid black;
-            padding: 3px 5px; 
-            text-align: center;
-            background-color: white;
-            vertical-align: middle;
-        }
-
-        #reportSummary {
-            font-size: 9pt; 
-        }
-        #reportSummary div {
-            margin: 3px 0;
-            font-weight: bold;
-        }
-
-        #reportComment {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid black;
-            font-size: 9pt; 
-            height: 30px; 
-            overflow: hidden;
-            background-color: white;
-        }
-        
-        .hidden {
-            display: none;
-        }
-
-        /* A4 PRINTING STYLES */
-        @media print {
-            @page {
-                size: A4 portrait;
-                margin: 1cm;
-            }
-            body > .page:not(#progressReport){
-                display: none !important;
-            }
-            #progressReport {
-                width: auto !important; 
-                min-height: auto !important;
-                margin: 0 !important; 
-                padding: 10px 20px 20px 20px !important; 
-                box-shadow: none !important; 
-                display: block !important;
-            }
-            /* Hide print buttons */
-            #progressReport .back-btn,
-            #progressReport .view-btn {
-                display: none !important;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MAGAWA SECONDARY SCHOOL - Results Portal (GitHub-backed test)</title>
+  <style>
+    /* ===== CSS from your stylesheet (trimmed for brevity, intact semantics) ===== */
+    body {
+      font-family: Arial, Helvetica, Tahoma, Geneva, sans-serif;
+      margin: 0; padding: 0; background-color: #f4f4f9; color: #333;
+    }
+    #app-container { max-width: 1200px; margin: 20px auto; border: 1px solid #ccc; background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,.1); min-height: 800px; }
+    .page { padding: 20px; display: none; min-height: 760px; }
+    .centered { text-align: center; }
+    .logo { width: 80px; height: 80px; background: #004d40; margin: 0 auto 15px; border-radius: 5px;
+      display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; }
+    .title { font-size: 24px; font-weight: bold; margin-bottom: 30px; }
+    .control-group { margin-bottom: 20px; }
+    input[type="text"], input[type="password"], select, button, textarea {
+      font-family: Arial, Helvetica, Tahoma, Geneva, sans-serif; padding: 10px; margin: 5px 0; width: 90%; max-width: 300px;
+      display: block; margin-left: auto; margin-right: auto; box-sizing: border-box; border: 1px solid #ccc;
+    }
+    button { background-color: #007AA5; color: white; border: none; cursor: pointer; font-size: 16px; transition: background-color .3s; border-radius: 8px; }
+    button:hover { background-color: #005C8C; }
+    .back-btn { float: left; margin-bottom: 10px; width: 100px; max-width: 100px; }
+    .portal-btn { width: 90%; max-width: 400px; margin-bottom: 15px; font-size: 18px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid black; }
+    th, td { border: 1px solid black; padding: 5px; text-align: center; }
+    th { background-color: #f2f2f2; font-weight: bold; }
+    #analysisTable th, #analysisTable td { padding: 8px 3px; min-width: 40px; font-size: 11px; }
+    #progressReport { background-color: white; color: black; padding: 25px 10px 10px 10px; width: 794px; min-height: 1123px;
+      box-shadow: 0 0 10px rgba(0,0,0,.5); margin: 20px auto; page-break-after: always; box-sizing: border-box; position: relative; }
+    #progressReport header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    #progressReport header .logo { width: 120px; height: 80px; margin: 0 15px 0 0; background-color: #004d40; border-radius: 5px;
+      display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; }
+    #reportHeaderRight { text-align: right; font-size: 9pt; }
+    #reportHeaderRight h3 { font-size: 16pt; margin: 0 0 5px 0; font-weight: bold; }
+    #progressReport h2 { font-size: 14pt; font-weight: bold; }
+    #reportDetails { margin: 15px 0; border-bottom: 1px solid black; padding-bottom: 10px; font-size: 10pt; }
+    #reportDetails div { display: flex; justify-content: space-between; margin-top: 5px; }
+    #resultsTable { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 9pt; }
+    #resultsTable th, #resultsTable td { border: 1px solid black; padding: 5px; text-align: left; background-color: white; }
+    #resultsTable th { background-color: #eee; text-align: center; font-weight: bold; }
+    #resultsTable thead tr th:nth-child(1){width:23%} #resultsTable thead tr th:nth-child(2){width:8%}
+    #resultsTable thead tr th:nth-child(3){width:8%} #resultsTable thead tr th:nth-child(4){width:12%}
+    #resultsTable thead tr th:nth-child(5){width:30%} #resultsTable thead tr th:nth-child(6){width:19%}
+    #gradeKeyTable { width: 100%; border-collapse: collapse; font-size: 9pt; }
+    #gradeKeyTable th, #gradeKeyTable td { border: 1px solid black; padding: 3px 5px; text-align: center; background-color: white; vertical-align: middle; }
+    #reportSummary { font-size: 9pt; }
+    #reportSummary div { margin: 3px 0; font-weight: bold; }
+    #reportComment { margin-top: 20px; padding: 10px; border: 1px solid black; font-size: 9pt; height: 30px; overflow: hidden; background-color: white; }
+    @media print {
+      @page { size: A4 portrait; margin: 1cm; }
+      body > .page:not(#progressReport):not(#data-analysis){ display: none !important; }
+      #progressReport, #data-analysis { width: auto !important; min-height: auto !important; margin: 0 !important; padding: 10px 20px 20px 20px !important; box-shadow: none !important; display: block !important; }
+      #progressReport .back-btn, #progressReport .view-btn, #data-analysis .back-btn, #data-analysis .print-btn { display: none !important; }
+    }
+  </style>
 </head>
 <body>
-
 <div id="app-container">
-    
-    <div id="front-page" class="page centered" style="display: block; overflow: hidden;">
-        <img src="https://raw.githubusercontent.com/magawass/mgs/main/logo.png" alt="Magawa Secondary School Logo" class="logo">
-        <div class="title">MAGAWA SECONDARY SCHOOL</div>
-        
-        <div class="control-group">
-            <label for="f_class_select">Select Class:</label>
-            <select id="f_class_select" onchange="updateStudentDropdowns()">
-                <option value="">-- Select Class --</option>
-                <option value="F1">Form 1</option>
-                <option value="F2">Form 2</option>
-                <option value="F3">Form 3</option>
-                <option value="F4">Form 4</option>
-            </select>
-        </div>
+  <!-- ===== FRONT PAGE ===== -->
+  <div id="front-page" class="page centered" style="display:block; overflow:hidden;">
+    <div class="logo">LOGO PLACEHOLDER</div>
+    <div class="title">MAGAWA SECONDARY SCHOOL</div>
 
-        <div class="control-group">
-            <label for="f_student_no">Select Student Number:</label>
-            <select id="f_student_no">
-                <option value="">-- Select Student No --</option>
-                </select>
-        </div>
-
-        <div class="control-group">
-            <label for="f_dob">Enter Student DOB (DD/MM/YYYY):</label>
-            <input type="text" id="f_dob" placeholder="e.g., 01/01/2005">
-        </div>
-
-        <button onclick="viewResults()">View Results</button>
-        <button onclick="promptLogin('000')">LOGIN</button>
+    <div class="control-group">
+      <label for="f_class_select">Select Class:</label>
+      <select id="f_class_select">
+        <option value="">-- Select Class --</option>
+        <option value="F1">Form 1</option>
+        <option value="F2">Form 2</option>
+        <option value="F3">Form 3</option>
+        <option value="F4">Form 4</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label for="f_student_no">Enter Student Exam Number:</label>
+      <input type="text" id="f_student_no" placeholder="e.g., M047/001"/>
+    </div>
+    <div class="control-group">
+      <label for="f_dob">Enter Student DOB (DD/MM/YYYY or YYYY-MM-DD):</label>
+      <input type="text" id="f_dob" placeholder="e.g., 01/01/2005"/>
     </div>
 
-    <div id="login-gate" class="page">
-        <button class="back-btn" onclick="showPage('front-page')">Back</button>
-        <div class="centered" style="padding-top: 50px;">
-            <div class="title">PORTAL SELECTION</div>
-            <button class="portal-btn" onclick="promptLogin('002', 'teachers-portal')">TEACHERS PORTAL</button>
-            <button class="portal-btn" onclick="promptLogin('001', 'admin-portal')">ADMIN PORTAL</button>
-        </div>
+    <button id="viewResultsBtn">View Results</button>
+    <button onclick="promptLogin('000', 'login-gate')">LOGIN</button>
+  </div>
+
+  <!-- ===== LOGIN GATE ===== -->
+  <div id="login-gate" class="page">
+    <button class="back-btn" onclick="showPage('front-page')">Back</button>
+    <div class="centered" style="padding-top:50px;">
+      <div class="title">PORTAL SELECTION</div>
+      <button class="portal-btn" onclick="promptLogin('002','teachers-portal')">TEACHERS PORTAL</button>
+      <button class="portal-btn" onclick="promptLogin('001','admin-portal')">ADMIN PORTAL</button>
     </div>
+  </div>
 
-    <div id="teachers-portal" class="page">
-        <button class="back-btn" onclick="showPage('login-gate')">Back</button>
-        <div class="centered" style="padding-top: 50px;">
-            <div class="title">TEACHERS PORTAL</div>
-            <button class="portal-btn" onclick="showPage('teacher-data-entry')">Data Entry</button>
-            <button class="portal-btn" onclick="showPage('score-view')">Score View</button>
-            <button class="portal-btn" onclick="showPage('grade-view')">Final Results View (Grade View)</button>
-            <button class="portal-btn" onclick="progressViewSelection()">Progress View</button> 
-            <button class="portal-btn" onclick="showPage('data-analysis')">Data Analysis</button>
-        </div>
+  <!-- ===== TEACHERS PORTAL ===== -->
+  <div id="teachers-portal" class="page">
+    <button class="back-btn" onclick="showPage('login-gate')">Back</button>
+    <div class="centered" style="padding-top:50px;">
+      <div class="title">TEACHERS PORTAL</div>
+      <button class="portal-btn" onclick="showPage('teacher-data-entry')">Data Entry</button>
+      <button class="portal-btn" onclick="showPage('score-view')">Score View</button>
+      <button class="portal-btn" onclick="showPage('grade-view')">Final Results View (Grade View)</button>
+      <button class="portal-btn" onclick="simulateProgressViewSelection()">Progress View</button>
+      <button class="portal-btn" onclick="showPage('data-analysis')">Data Analysis</button>
     </div>
-    
-    <div id="teacher-data-entry" class="page">
-        <button class="back-btn" onclick="showPage('teachers-portal')">Back</button>
-        <div class="centered" style="padding-top: 50px;">
-            <div class="title">DATA ENTRY</div>
-            <p style="color: red;">*Reminder: Teachers must fill their results before deadline.*</p>
-            
-            <label for="de_class">Select Class:</label>
-            <select id="de_class" style="max-width: 400px;"></select>
-            
-            <label for="de_subject">Select Subject:</label>
-            <select id="de_subject" style="max-width: 400px;"></select>
-            
-            <label for="de_exam_no">Select/Enter Student Exam No:</label>
-            <input type="text" id="de_exam_no" value="" style="max-width: 400px;" onkeyup="updateStudentName()">
-            
-            <label for="de_student_name">Selected Student Name:</label>
-            <input type="text" id="de_student_name" value="Awaiting Lookup" readonly style="max-width: 400px; background-color: #eee;">
-            
-            <label for="de_score">Enter Score:</label>
-            <input type="text" id="de_score" placeholder="e.g., 78" style="max-width: 400px;">
-            
-            <label for="de_term">Select Term:</label>
-            <select id="de_term" style="max-width: 400px;">
-                <option>Term 1</option><option>Term 2</option><option>Term 3</option>
-            </select>
+  </div>
 
-            <label for="de_comments">General Comments (3 lines):</label>
-            <textarea id="de_comments" style="max-width: 400px; height: 60px;" placeholder="Enter comments for the student's progress report..."></textarea>
-            
-            <label for="de_token">GitHub Token to Save Data:</label>
-            <input type="password" id="de_token" placeholder="Enter Token" style="max-width: 400px;">
-            
-            <button style="max-width: 400px;" onclick="alert('Note: This button is not fully connected to GitHub. Use Save & Upload Data below.')">Submit Score (Sim)</button>
-            <button style="max-width: 400px;" onclick="saveAndUploadData()">Save & Upload Data</button>
-        </div>
+  <!-- ===== DATA ENTRY ===== -->
+  <div id="teacher-data-entry" class="page">
+    <button class="back-btn" onclick="showPage('teachers-portal')">Back</button>
+    <div class="centered" style="padding-top:50px;">
+      <div class="title">DATA ENTRY</div>
+      <p style="color:red;">*Reminder: Teachers must fill their results before deadline.*</p>
+
+      <label for="de_class">Select Class:</label>
+      <select id="de_class" style="max-width:400px;"></select>
+
+      <label for="de_subject">Select Subject:</label>
+      <select id="de_subject" style="max-width:400px;"></select>
+
+      <label for="de_exam_no">Select/Enter Student Exam No:</label>
+      <input type="text" id="de_exam_no" style="max-width:400px;" onkeyup="updateStudentName()"/>
+
+      <label for="de_student_name">Selected Student Name:</label>
+      <input type="text" id="de_student_name" value="Student Not Found" readonly style="max-width:400px; background-color:#eee;"/>
+
+      <label for="de_score">Enter Score (0-100):</label>
+      <input type="text" id="de_score" placeholder="e.g., 78" style="max-width:400px;"/>
+
+      <label for="de_term">Select Term:</label>
+      <select id="de_term" style="max-width:400px;">
+        <option>Term 1</option><option selected>Term 2</option><option>Term 3</option>
+      </select>
+
+      <label for="de_comments">General Comments (3 lines):</label>
+      <textarea id="de_comments" style="max-width:400px; height:60px;" placeholder="Enter comments for the student's progress report..."></textarea>
+
+      <label for="de_token">GitHub Token to Save Data:</label>
+      <input type="password" id="de_token" placeholder="Enter Token" style="max-width:400px;"/>
+
+      <button style="max-width:400px;" onclick="submitScore()">Submit Score</button>
     </div>
-    
-    <div id="admin-portal" class="page">
-        <button class="back-btn" onclick="showPage('login-gate')">Back</button>
-        <div class="centered" style="padding-top: 50px;">
-            <div class="title">ADMIN PORTAL</div>
-            <button class="portal-btn" onclick="showPage('admin-repo-management')">Upload/Delete CSV Files</button>
-            <button class="portal-btn" onclick="showPage('admin-teacher-assignment')">Assign Teachers to Subjects</button>
-            <hr style="width: 400px; margin: 20px auto;">
-            <button class="portal-btn" onclick="progressViewSelection()">Progress View</button> 
-            <button class="portal-btn" onclick="showPage('score-view')">Score View</button>
-            <button class="portal-btn" onclick="showPage('grade-view')">Final Results View (Grade View)</button>
-            <button class="portal-btn" onclick="showPage('data-analysis')">Data Analysis</button>
-        </div>
+  </div>
+
+  <!-- ===== ADMIN PORTAL ===== -->
+  <div id="admin-portal" class="page">
+    <button class="back-btn" onclick="showPage('login-gate')">Back</button>
+    <div class="centered" style="padding-top:50px;">
+      <div class="title">ADMIN PORTAL</div>
+      <button class="portal-btn" onclick="showPage('admin-repo-management')">Upload/Delete CSV Files</button>
+      <button class="portal-btn" onclick="showPage('admin-teacher-assignment')">Assign Teachers to Subjects</button>
+      <hr style="width:400px; margin:20px auto;">
+      <button class="portal-btn" onclick="simulateProgressViewSelection()">Progress View</button>
+      <button class="portal-btn" onclick="showPage('score-view')">Score View</button>
+      <button class="portal-btn" onclick="showPage('grade-view')">Final Results View (Grade View)</button>
+      <button class="portal-btn" onclick="showPage('data-analysis')">Data Analysis</button>
     </div>
-    
-    <div id="admin-repo-management" class="page">
-        <button class="back-btn" onclick="showPage('admin-portal')">Back</button>
-        <div class="centered" style="padding-top: 50px;">
-            <div class="title">GITHUB REPO MANAGEMENT (Simulated Upload)</div>
-            
-            <label for="repo_class">Select Class for File:</label>
-            <select id="repo_class" style="max-width: 400px;"></select>
-            
-            <label>Select CSV File (Exam No, Name, DOB):</label>
-            <input type="file" id="csv_file" accept=".csv" style="max-width: 400px; border: none;">
-            
-            <label for="repo_token">GitHub Token:</label>
-            <input type="password" id="repo_token" placeholder="Enter GitHub Token (mgs, magawass)" style="max-width: 400px;">
-            
-            <button style="max-width: 400px;" onclick="alert('Uploading file for ' + document.getElementById('repo_class').value + ' to GitHub repo (Requires full implementation)')">Confirm Upload</button>
-            <button style="max-width: 400px; background-color: #d32f2f;" onclick="alert('Deleting file for ' + document.getElementById('repo_class').value + ' from GitHub repo (Requires full implementation)')">Delete CSV File</button>
-        </div>
+  </div>
+
+  <!-- ===== ADMIN: REPO MGMT ===== -->
+  <div id="admin-repo-management" class="page">
+    <button class="back-btn" onclick="showPage('admin-portal')">Back</button>
+    <div class="centered" style="padding-top:50px;">
+      <div class="title">GITHUB REPO MANAGEMENT</div>
+      <p style="color:blue;">Upload a CSV (Exam No, Student’s Name, DOB) to students JSON in your repo.</p>
+
+      <label for="repo_class">Select Class for File:</label>
+      <select id="repo_class" style="max-width:400px;"></select>
+
+      <label>Select CSV File (Exam No, Name, DOB):</label>
+      <input type="file" id="csv_file" accept=".csv" style="max-width:400px; border:none;"/>
+
+      <label for="repo_token">GitHub Token:</label>
+      <input type="password" id="repo_token" placeholder="Enter GitHub Token (mgs, magawass)" style="max-width:400px;"/>
+
+      <button style="max-width:400px;" onclick="handleFileUpload()">Confirm Upload</button>
     </div>
+  </div>
 
-    <div id="admin-teacher-assignment" class="page">
-        <button class="back-btn" onclick="showPage('admin-portal')">Back</button>
-        <div class="centered" style="padding-top: 50px;">
-            <div class="title">TEACHER ASSIGNMENT (Simulated)</div>
-            
-            <label for="assign_subject">Select Subject:</label>
-            <select id="assign_subject" style="max-width: 400px;"></select>
-            
-            <label for="assign_teacher">Teacher Name:</label>
-            <input type="text" id="assign_teacher" placeholder="e.g., Mr. Banda" style="max-width: 400px;">
-            
-            <button style="max-width: 400px;" onclick="alert('Teacher ' + document.getElementById('assign_teacher').value + ' assigned to ' + document.getElementById('assign_subject').value + ' (Simulated)')">Confirm Assignment</button>
-        </div>
+  <!-- ===== ADMIN: TEACHER ASSIGNMENT ===== -->
+  <div id="admin-teacher-assignment" class="page">
+    <button class="back-btn" onclick="showPage('admin-portal')">Back</button>
+    <div class="centered" style="padding-top:50px;">
+      <div class="title">TEACHER ASSIGNMENT</div>
+      <label for="assign_subject">Select Subject:</label>
+      <select id="assign_subject" style="max-width:400px;"></select>
+      <label for="assign_teacher">Teacher Name:</label>
+      <input type="text" id="assign_teacher" placeholder="e.g., Mr. Banda" style="max-width:400px;"/>
+      <button style="max-width:400px;" onclick="handleTeacherAssignment()">Confirm Assignment</button>
     </div>
-    
-    <div id="score-view" class="page">
-        <button class="back-btn" onclick="showPage('teachers-portal')">Back</button>
-        <div class="centered" style="padding-top: 50px;">
-            <div class="title">SCORE VIEW</div>
-            <label for="sv_class">Select Class:</label>
-            <select id="sv_class" style="max-width: 300px;"></select>
-            <button style="max-width: 300px;" onclick="viewScores()">View Scores</button>
-            
-            <table style="margin-top: 20px;">
-                <thead>
-                    <tr>
-                        <th style="width: 8%;">Exam No</th>
-                        <th style="width: 15%;">STUDENT’S NAME</th>
-                        <th style="width: 6%;">Agri</th>
-                        <th style="width: 6%;">BK</th>
-                        <th style="width: 6%;">Bio</th>
-                        <th style="width: 6%;">Chem</th>
-                        <th style="width: 6%;">Chichewa</th>
-                        <th style="width: 6%;">Eng</th>
-                        <th style="width: 6%;">Geo</th>
-                        <th style="width: 6%;">Hist</th>
-                        <th style="width: 6%;">Math</th>
-                        <th style="width: 6%;">Phy</th>
-                        <th style="width: 6%;">Social</th>
-                    </tr>
-                </thead>
-                <tbody id="scoreBody">
-                </tbody>
-            </table>
-        </div>
+  </div>
+
+  <!-- ===== SCORE VIEW ===== -->
+  <div id="score-view" class="page">
+    <button class="back-btn" onclick="showPage('teachers-portal')">Back</button>
+    <div class="centered" style="padding-top:50px;">
+      <div class="title">SCORE VIEW</div>
+      <label for="sv_class">Select Class:</label>
+      <select id="sv_class" style="max-width:300px;"></select>
+      <button style="max-width:300px;" onclick="updateViewTable('score-view','sv_class', (cls)=>updateScoreViewTable(cls, document.getElementById('repo_token').value.trim()))">View Scores</button>
+
+      <table style="margin-top:20px;">
+        <thead>
+        <tr>
+          <th style="width:8%;">Exam No</th>
+          <th style="width:15%;">STUDENT’S NAME</th>
+          <th style="width:6%;">Agri</th>
+          <th style="width:6%;">BK</th>
+          <th style="width:6%;">Bio</th>
+          <th style="width:6%;">Chem</th>
+          <th style="width:6%;">Chichewa</th>
+          <th style="width:6%;">Eng</th>
+          <th style="width:6%;">Geo</th>
+          <th style="width:6%;">Hist</th>
+          <th style="width:6%;">Math</th>
+          <th style="width:6%;">Phy</th>
+          <th style="width:6%;">Social</th>
+        </tr>
+        </thead>
+        <tbody id="scoreViewBody">
+        <tr><td colspan="13">Select a class and click "View Scores" to see data.</td></tr>
+        </tbody>
+      </table>
     </div>
+  </div>
 
-    <div id="grade-view" class="page">
-        <button class="back-btn" onclick="showPage('teachers-portal')">Back</button>
-        <div class="centered" style="padding-top: 50px;">
-            <div class="title">GRADE VIEW</div>
-            <label for="gv_class">Select Class:</label>
-            <select id="gv_class" style="max-width: 300px;"></select>
-            <button style="max-width: 300px;" onclick="viewGrades()">View Grades</button>
-            
-            <table style="margin-top: 20px;">
-                <thead>
-                    <tr>
-                        <th style="width: 8%;">Exam No</th>
-                        <th style="width: 15%;">STUDENT’S NAME</th>
-                        <th style="width: 5%;">Agri</th>
-                        <th style="width: 5%;">BK</th>
-                        <th style="width: 5%;">Bio</th>
-                        <th style="width: 5%;">Chem</th>
-                        <th style="width: 5%;">Chic</th>
-                        <th style="width: 5%;">Eng</th>
-                        <th style="width: 5%;">Geo</th>
-                        <th style="width: 5%;">Hist</th>
-                        <th style="width: 5%;">Math</th>
-                        <th style="width: 5%;">Phy</th>
-                        <th style="width: 5%;">Social</th>
-                        <th style="width: 7%;">Aggregate/Total</th>
-                    </tr>
-                </thead>
-                <tbody id="gradeBody">
-                </tbody>
-            </table>
-        </div>
+  <!-- ===== GRADE VIEW ===== -->
+  <div id="grade-view" class="page">
+    <button class="back-btn" onclick="showPage('teachers-portal')">Back</button>
+    <div class="centered" style="padding-top:50px;">
+      <div class="title">GRADE VIEW</div>
+      <label for="gv_class">Select Class:</label>
+      <select id="gv_class" style="max-width:300px;"></select>
+      <button style="max-width:300px;" onclick="updateViewTable('grade-view','gv_class', (cls)=>updateGradeViewExample(cls, document.getElementById('repo_token').value.trim()))">View Grades</button>
+
+      <table style="margin-top:20px;">
+        <thead>
+        <tr>
+          <th style="width:8%;">Exam No</th>
+          <th style="width:15%;">STUDENT’S NAME</th>
+          <th style="width:5%;">Agri</th>
+          <th style="width:5%;">BK</th>
+          <th style="width:5%;">Bio</th>
+          <th style="width:5%;">Chem</th>
+          <th style="width:5%;">Chichewa</th>
+          <th style="width:5%;">Eng</th>
+          <th style="width:5%;">Geo</th>
+          <th style="width:5%;">Hist</th>
+          <th style="width:5%;">Math</th>
+          <th style="width:5%;">Phy</th>
+          <th style="width:5%;">Social</th>
+          <th style="width:7%;">Aggregate/Total</th>
+        </tr>
+        </thead>
+        <tbody id="gradeViewBody">
+        <tr><td colspan="14">Select a class and click "View Grades" to see data.</td></tr>
+        </tbody>
+      </table>
     </div>
+  </div>
 
-    <div id="progressReport" class="page" style="display: none;">
-        <button class="back-btn" onclick="showPage('front-page')" style="position: absolute; top: 20px; left: 20px;">Back</button>
-        <button class="view-btn" onclick="window.print()" style="position: absolute; top: 20px; right: 20px; width: 100px; max-width: 100px;">Print Report</button>
-        
-        <div style="clear: both;"></div>
-
-        <header>
-            <div style="display: flex; align-items: center;">
-                <img src="https://raw.githubusercontent.com/magawass/mgs/main/logo.png" alt="Magawa Secondary School Logo" class="logo">
-            </div>
-            <div id="reportHeaderRight">
-                <h3>MAGAWA SECONDARY SCHOOL</h3>
-                Private Bag 17,<br>
-                Magawa,<br>
-                Mchinji.
-            </div>
-        </header>
-        
-        <hr style="border-top: 2px solid black; margin: 10px 0;">
-        
-        <div style="margin-bottom: 10px;">
-            <h2 style="margin: 0;">PROGRESS REPORT</h2>
-        </div>
-        
-        <div id="reportDetails">
-            <div>
-                <p><strong>STUDENT NAME:</strong> <span id="reportStudentName"></span></p>
-                <p><strong>Exam No:</strong> <span id="reportExamNo"></span></p>
-            </div>
-            <div>
-                <p><strong>FORM:</strong> <span id="reportForm"></span></p>
-                <p><strong>TERM:</strong> <span id="reportTerm">2</span></p> 
-            </div>
-        </div>
-        
-        <table id="resultsTable">
-            <thead>
-                <tr>
-                    <th style="width: 23%;">SUBJECT</th>
-                    <th style="width: 8%;">SCORE</th>
-                    <th style="width: 8%;">GRADE</th>
-                    <th style="width: 12%;">POSITION</th>
-                    <th style="width: 30%;">REMARKS</th>
-                    <th style="width: 19%;">TEACHER</th>
-                </tr>
-            </thead>
-            <tbody id="reportBody">
-                </tbody>
-        </table>
-
-        <div id="summaryAndKeyWrapper" style="display: flex; justify-content: space-between; margin-top: 20px;">
-
-            <div id="reportSummary" style="width: 48%; border: 1px solid black; padding: 8px; box-sizing: border-box;">
-                <p style="font-weight: bold; margin-bottom: 5px; font-size: 9pt;">SUMMARY OF RESULTS (<span id="reportSummaryClassText"></span>)</p>
-                
-                <div id="aggregateLine" class="hidden">Aggregate: <span id="reportAggregate">**N/A**</span></div>
-                <div id="averageLine" class="hidden">Total: <span id="reportTotal">**N/A**</span></div>
-                <div id="totalLine" class="hidden">Average: <span id="reportAverage">**N/A**</span></div>
-                
-                <div>Position in Class: <span id="reportPosition">**N/A**</span></div>
-                <div>Overall Remark: <span id="reportOverallRemark" style="color: red;">**FAIL**</span></div>
-            </div>
-            
-            <div id="gradeKeyPlaceholder" style="width: 48%; border: 1px solid #000; padding: 5px; box-sizing: border-box;">
-                 <p style="font-weight: bold; text-align: center; font-size: 9pt;">GRADE SCALE (<span id="reportScaleClassText"></span>)</p>
-                 <table id="gradeKeyTable">
-                     <thead><tr><th>RANGE</th><th>GRADES</th><th>COMMENT</th></tr></thead>
-                     <tbody id="reportGradeScaleBody">
-                         </tbody>
-                 </table>
-            </div>
-
-        </div>
-        <p style="margin-top: 20px; font-size: 9pt;"><strong>GENERAL COMMENTS:</strong></p>
-        <div id="reportComment">
-            Comments will appear here.
-        </div>
-
-        <p style="text-align: right; font-size: 9pt; margin-top: 40px;">
-            Head Teacher Signature: ______________________
+  <!-- ===== DATA ANALYSIS ===== -->
+  <div id="data-analysis" class="page">
+    <button class="back-btn" onclick="showPage('teachers-portal')">Back</button>
+    <div class="centered" style="padding-top:50px; max-width:1000px; margin:0 auto;">
+      <div class="title">DATA ANALYSIS</div>
+      <div style="display:flex; justify-content:center; gap:20px; max-width:600px; margin:0 auto 30px;">
+        <label for="da_class" style="display:flex; align-items:center; gap:10px;">Select Class:</label>
+        <select id="da_class" style="max-width:200px;"></select>
+        <button style="max-width:150px;" onclick="updateViewTable('data-analysis','da_class', (cls)=>updateDataAnalysisTable(cls, document.getElementById('repo_token').value.trim()))">View Analysis</button>
+        <button class="print-btn" onclick="window.print()" style="max-width:150px;">Print Report</button>
+      </div>
+      <div id="analysisTableContainer">
+        <p style="margin-top:30px;">
+          *Analysis Section Placeholder*<br>
+          Select a class and click "View Analysis" to generate the report.
         </p>
+      </div>
+    </div>
+  </div>
 
-        <p style="text-align: center; font-size: 8pt; margin-top: 10px;">Progress of results covers one A4 page only.</p>
+  <!-- ===== PROGRESS REPORT ===== -->
+  <div id="progressReport" class="page" style="display:none;">
+    <button class="back-btn" style="position:absolute; top:20px; left:20px;" onclick="showPage('front-page')">Back</button>
+    <button class="view-btn" onclick="window.print()" style="position:absolute; top:20px; right:20px; width:100px; max-width:100px;">Print Report</button>
+    <div style="clear:both;"></div>
+
+    <header>
+      <div style="display:flex; align-items:center;">
+        <div class="logo">LOGO</div>
+      </div>
+      <div id="reportHeaderRight">
+        <h3>MAGAWA SECONDARY SCHOOL</h3>
+        Private Bag 17,<br>Magawa,<br>Mchinji.
+      </div>
+    </header>
+    <hr style="border-top:2px solid black; margin:10px 0;">
+    <div style="margin-bottom:10px;">
+      <h2 style="margin:0;">PROGRESS REPORT</h2>
     </div>
-    
-    <div id="data-analysis" class="page">
-        <button class="back-btn" onclick="showPage('teachers-portal')">Back</button>
-        <div class="centered" style="padding-top: 50px;">
-            <div class="title">DATA ANALYSIS (Simulated)</div>
-            <label for="da_class">Select Class:</label>
-            <select id="da_class" style="max-width: 300px;"></select>
-            <button style="max-width: 300px;" onclick="alert('Displaying Analysis for selected class (Requires full implementation)')">View Analysis</button>
-            
-            <table style="margin-top: 20px; font-size: 10pt;">
-                <thead>
-                    <tr>
-                        <th style="width: 10%;">GRADES</th>
-                        <th>Agri</th>
-                        <th>BK</th>
-                        <th>Bio</th>
-                        <th>Chem</th>
-                        <th>Chic</th>
-                        <th>Eng</th>
-                        <th>Geo</th>
-                        <th>Hist</th>
-                        <th>Math</th>
-                        <th>Phy</th>
-                        <th>Social</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>A (80-100)</td><td>5</td><td>3</td><td>7</td><td>4</td><td>5</td><td>2</td><td>6</td><td>3</td><td>1</td><td>4</td><td>5</td></tr>
-                    <tr><td>B (65-79)</td><td>10</td><td>15</td><td>12</td><td>10</td><td>14</td><td>10</td><td>15</td><td>12</td><td>5</td><td>10</td><td>11</td></tr>
-                    <tr><td>C (55-64)</td><td>8</td><td>7</td><td>5</td><td>9</td><td>6</td><td>12</td><td>4</td><td>8</td><td>10</td><td>9</td><td>6</td></tr>
-                    <tr><td>D (40-54)</td><td>4</td><td>3</td><td>3</td><td>4</td><td>4</td><td>5</td><td>3</td><td>5</td><td>8</td><td>5</td><td>5</td></tr>
-                    <tr><td>F (0-39)</td><td>3</td><td>2</td><td>3</td><td>3</td><td>1</td><td>1</td><td>2</td><td>2</td><td>6</td><td>2</td><td>2</td></tr>
-                    <tr><td style="font-weight: bold;">Absent</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
-                    <tr><td style="font-weight: bold;">Sat for Exam</td><td>30</td><td>30</td><td>30</td><td>30</td><td>30</td><td>30</td><td>30</td><td>30</td><td>30</td><td>30</td><td>30</td></tr>
-                    <tr><td style="font-weight: bold;">Passed</td><td>27</td><td>28</td><td>27</td><td>27</td><td>28</td><td>29</td><td>28</td><td>28</td><td>24</td><td>27</td><td>28</td></tr>
-                    <tr><td style="font-weight: bold;">Failed</td><td>3</td><td>2</td><td>3</td><td>3</td><td>2</td><td>1</td><td>2</td><td>2</td><td>6</td><td>3</td><td>2</td></tr>
-                    <tr><td style="font-weight: bold; color: green;">Pass %</td><td>90.0%</td><td>93.3%</td><td>90.0%</td><td>90.0%</td><td>93.3%</td><td>96.7%</td><td>93.3%</td><td>93.3%</td><td>80.0%</td><td>90.0%</td><td>93.3%</td></tr>
-                </tbody>
-            </table>
-        </div>
+
+    <div id="reportDetails">
+      <div>
+        <p><strong>STUDENT NAME:</strong> <span id="reportStudentName"></span></p>
+        <p><strong>Exam No:</strong> <span id="reportExamNo"></span></p>
+      </div>
+      <div>
+        <p><strong>FORM:</strong> <span id="reportForm"></span></p>
+        <p><strong>TERM:</strong> <span id="reportTerm">Term 2</span></p>
+      </div>
     </div>
-    
+
+    <table id="resultsTable">
+      <thead>
+      <tr>
+        <th>SUBJECT</th>
+        <th>SCORE</th>
+        <th>GRADE</th>
+        <th>POSITION</th>
+        <th>REMARKS</th>
+        <th>TEACHER</th>
+      </tr>
+      </thead>
+      <tbody id="reportBody"></tbody>
+    </table>
+
+    <div id="summaryAndKeyWrapper" style="display:flex; justify-content:space-between; margin-top:20px;">
+      <div id="reportSummary" style="width:48%; border:1px solid black; padding:5px;">
+        <div style="text-align:center; margin-bottom:5px; font-size:10pt;">SUMMARY FOR <span id="reportSummaryClassText"></span></div>
+        <hr style="border-top:1px solid black; margin:3px 0;">
+        <div><p>TOTAL SCORE:</p> <p id="reportSummaryTotalScore">0</p></div>
+        <div><p>AVERAGE SCORE:</p> <p id="reportSummaryAverageScore">0.0</p></div>
+        <div><p>OVERALL RANK:</p> <p id="reportSummaryOverallRank">-</p></div>
+        <div><p>OVERALL REMARK:</p> <p id="reportSummaryOverallRemark">-</p></div>
+        <div><p>AGGREGATE (F3/F4):</p> <p id="reportSummaryAggregate">N/A</p></div>
+      </div>
+
+      <div id="reportGradeKey" style="width:48%; border:1px solid black; padding:5px;">
+        <div style="text-align:center; margin-bottom:5px; font-size:10pt;">GRADE KEY FOR <span id="reportGradeKeyFor"></span></div>
+        <hr style="border-top:1px solid black; margin:3px 0;">
+        <table id="gradeKeyTable">
+          <thead><tr><th>SCORE</th><th>GRADE</th><th>REMARK</th></tr></thead>
+          <tbody id="reportGradeScaleBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="reportComment">
+      No comment available.
+    </div>
+
+    <div style="margin-top:50px; display:flex; justify-content:space-between; font-size:10pt;">
+      <div style="width:30%; text-align:center;">
+        <hr style="border-top:1px solid black; margin-bottom:5px;">CLASS TEACHER
+      </div>
+      <div style="width:30%; text-align:center;">
+        <hr style="border-top:1px solid black; margin-bottom:5px;">HEAD TEACHER
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-    // ============================================== DATA SETUP (Initial placeholders for live loading) ==============================================
-    const ALL_SUBJECTS = ["Agriculture", "Bible Knowledge", "Biology", "Chemistry", "Chichewa", "English", "Geography", "History", "Mathematics", "Physics", "Social"];
-    const ALL_CLASSES = ["Form 1", "Form 2", "Form 3", "Form 4"];
+  // ===== CONFIG =====
+  const OWNER = "magawass";
+  const REPO = "mgs";
+  const BASE = `https://api.github.com/repos/${OWNER}/${REPO}/contents`;
+  const ALL_SUBJECTS = ["Agriculture","Bible Knowledge","Biology","Chemistry","Chichewa","English","Geography","History","Mathematics","Physics","Social"];
+  const CLASSES = ["F1","F2","F3","F4"];
+  const TERMS = ["Term 1","Term 2","Term 3"];
 
-    // Placeholder data structures - these will be populated on demand
-    const STUDENT_MASTER_LIST = {}; 
-    const CLASS_SCORES_CACHE = {}; 
-    
-    // YOUR REPO DETAILS
-    const GITHUB_OWNER = 'magawass';
-    const GITHUB_REPO = 'mgs';
-    const DATA_PATH = 'data/';
-    
-    // ============================================== GRADING LOGIC (Remains the same) ==============================================
+  // ===== GITHUB HELPERS =====
+  function ghHeaders(token) {
+    return { "Authorization": `token ${token}`, "Accept": "application/vnd.github+json", "Content-Type": "application/json" };
+  }
+  async function ghGet(path, token) {
+    const res = await fetch(`${BASE}/${path}`, { headers: ghHeaders(token) });
+    if (res.status === 404) return null;
+    if (!res.ok) throw new Error(`GitHub GET ${path} failed: ${res.status}`);
+    return res.json();
+  }
+  async function ghReadJson(path, token) {
+    const meta = await ghGet(path, token);
+    if (!meta) return { data: [], sha: null };
+    const data = JSON.parse(atob(meta.content));
+    return { data, sha: meta.sha };
+  }
+  async function ghPut(path, jsonData, message, token, currentSha = null) {
+    const body = { message: message || "Update data", content: btoa(JSON.stringify(jsonData, null, 2)), sha: currentSha || undefined };
+    const res = await fetch(`${BASE}/${path}`, { method: "PUT", headers: ghHeaders(token), body: JSON.stringify(body) });
+    if (!res.ok) throw new Error(`GitHub PUT ${path} failed: ${res.status}`);
+    return res.json();
+  }
+  async function ghEnsureWrite(path, token, transform, commitMsg) {
+    const { data, sha } = await ghReadJson(path, token);
+    const next = transform(Array.isArray(data) ? data : []);
+    return ghPut(path, next, commitMsg, token, sha);
+  }
 
-    function getGradeF12(score) {
-        if (score === 0 || score === '-') return '-';
-        const s = parseInt(score);
-        if (s >= 80) return 'A';
-        if (s >= 65) return 'B';
-        if (s >= 55) return 'C';
-        if (s >= 40) return 'D';
-        return 'F';
-    }
+  // ===== GRADING LOGIC =====
+  function getGradeF12(score){ if(score>=80)return 'A'; if(score>=65)return 'B'; if(score>=55)return 'C'; if(score>=40)return 'D'; return 'F'; }
+  function getRemarkF12(grade){ if(grade==='-')return 'N/A'; if(grade==='A')return 'Excellent'; if(grade==='B')return 'Very Good'; if(grade==='C')return 'Good'; if(grade==='D')return 'Satisfactory'; return 'Fail'; }
+  function getGradeF34(score){ if(score>=90)return 1; if(score>=80)return 2; if(score>=70)return 3; if(score>=60)return 4; if(score>=55)return 5; if(score>=50)return 6; if(score>=40)return 8; return 9; }
+  function getRemarkF34(grade){ if(grade==='-')return 'N/A'; if(grade<=2)return 'Excellent'; if(grade<=4)return 'Very Good'; if(grade<=6)return 'Good'; if(grade===8)return 'Satisfactory'; return 'Fail'; }
+  function isSubjectPass(grade,isF12){ if(grade==='-')return false; return isF12 ? (['A','B','C','D'].includes(grade)) : (Number(grade) <= 8); }
+  function calculateAggregate(scoresBySubject){
+    const grades=[]; ALL_SUBJECTS.forEach(sub=>{ const s=scoresBySubject[sub]||0; if(s>0) grades.push(getGradeF34(s)); });
+    if(grades.length<6) return 'N/A'; grades.sort((a,b)=>a-b); const bestSix=grades.slice(0,6); return bestSix.reduce((sum,g)=>sum+g,0);
+  }
+  function normalizeDob(dob){ if(/^\d{2}\/\d{2}\/\d{4}$/.test(dob)){ const [d,m,y]=dob.split('/'); return `${y}-${m}-${d}`; } return dob; }
 
-    function getRemarkF12(grade) {
-        if (grade === '-') return 'N/A';
-        if (grade === 'A') return 'Excellent';
-        if (grade === 'B') return 'Very good';
-        if (grade === 'C') return 'Good';
-        if (grade === 'D') return 'Average';
-        return 'Fail';
-    }
-
-    function getGradeF34(score) {
-        if (score === 0 || score === '-') return '-';
-        const s = parseInt(score);
-        if (s >= 80) return 1;
-        if (s >= 75) return 2;
-        if (s >= 70) return 3;
-        if (s >= 65) return 4;
-        if (s >= 60) return 5;
-        if (s >= 55) return 6;
-        if (s >= 45) return 7;
-        if (s >= 35) return 8;
-        return 9;
-    }
-
-    function getRemarkF34(grade) {
-        if (grade === '-') return 'N/A';
-        if (grade <= 2) return 'Distinction';
-        if (grade <= 4) return 'Strong credit';
-        if (grade <= 6) return 'Credit';
-        if (grade <= 8) return 'Pass';
-        return 'Fail';
-    }
-    
-    function isSubjectPass(grade, isF12) {
-        if (grade === '-') return false;
-        if (isF12) {
-            return grade !== 'F'; 
-        } else {
-            return grade !== 9;
-        }
-    }
-
-    function getOverallRemark(studentScores, isF12) {
-        let passedSubjects = 0;
-        let passedEnglish = false;
-        
-        for (const subject of ALL_SUBJECTS) {
-            const score = studentScores[subject] || 0;
-            // Handle both 0 (unscored) and '-' (missing/absent) as non-countable
-            if (score === 0 || score === '-') continue; 
-            
-            const grade = isF12 ? getGradeF12(score) : getGradeF34(score);
-
-            if (isSubjectPass(grade, isF12)) {
-                passedSubjects++;
-            }
-            if (subject === 'English' && isSubjectPass(grade, isF12)) {
-                passedEnglish = true;
-            }
-        }
-        
-        if (passedSubjects >= 6 && passedEnglish) {
-            return 'PASS';
-        }
-        return 'FAIL';
-    }
-
-    function calculateAggregate(studentScores) {
-        let grades = [];
-
-        for (const subject of ALL_SUBJECTS) {
-            const score = studentScores[subject] || 0;
-            if (score > 0 && score !== '-') {
-                const grade = getGradeF34(score);
-                grades.push(grade);
-            }
-        }
-        
-        if (grades.length < 6) return 'N/A'; 
-
-        grades.sort((a, b) => a - b);
-        
-        let bestSixGrades = grades.slice(0, 6);
-        let aggregate = bestSixGrades.reduce((sum, grade) => sum + grade, 0);
-        
-        return aggregate;
-    }
-
-    // ============================================== GITHUB INTERACTION / UTILITIES ==============================================
-
-    /**
-     * Helper to parse simple CSV text into an array of objects.
-     * Assumes the first row is headers.
-     */
-    function parseSimpleCsv(csvText) {
-        const lines = csvText.trim().split('\n');
-        if (lines.length < 1) return { headers: [], data: [] };
-        
-        const headers = lines[0].split(',').map(h => h.trim());
-        const data = [];
-
-        for (let i = 1; i < lines.length; i++) {
-            const values = lines[i].split(',').map(v => v.trim());
-            if (values.length === headers.length) {
-                let row = {};
-                headers.forEach((header, index) => {
-                    row[header] = values[index];
-                });
-                data.push(row);
-            }
-        }
-        return { headers, data };
-    }
-    
-    /**
-     * Fetches a raw file (e.g., CSV) from the GitHub repository.
-     */
-    async function fetchRawFile(fileName) {
-        const url = `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/${DATA_PATH}${fileName}`;
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                // Return an empty string or null instead of throwing, so the UI can handle 'no file' gracefully
-                console.warn(`Failed to fetch ${fileName}: ${response.statusText}. File may not exist yet.`);
-                return null;
-            }
-            return await response.text();
-        } catch (error) {
-            console.error(`Error fetching ${fileName}:`, error);
-            return null;
-        }
-    }
-    
-    /**
-     * Loads the master student list (ExamNo, Name, DOB).
-     */
-    async function loadMasterList() {
-        const csvText = await fetchRawFile('students.csv');
-        if (!csvText) {
-             alert("WARNING: Cannot load master student list. DOB verification will fail.");
-             return false;
-        }
-        
-        const { data } = parseSimpleCsv(csvText);
-        
-        data.forEach(row => {
-            if (row['Exam No']) {
-                 STUDENT_MASTER_LIST[row['Exam No']] = { 
-                    name: row['Name'] || 'N/A', 
-                    dob: row['DOB'] || 'N/A' // Assumes format DD/MM/YYYY
-                };
-            }
-        });
-        return true;
-    }
-
-    // Fill all class/subject dropdowns
-    function populateDropdowns() {
-        const classSelectors = document.querySelectorAll('#f_class_select, #de_class, #repo_class, #sv_class, #gv_class, #da_class');
-        classSelectors.forEach(select => {
-            // Only add options if they don't exist to prevent duplicates
-            if (select.children.length <= 1) { 
-                select.innerHTML = '<option value="">-- Select Class --</option>' + ALL_CLASSES.map(c => `<option value="${c.replace(' ', '')}">${c}</option>`).join('');
-            }
-        });
-
-        const subjectSelectors = document.querySelectorAll('#de_subject, #assign_subject');
-        subjectSelectors.forEach(select => {
-            if (select.children.length <= 1) { 
-                select.innerHTML = '<option value="">-- Select Subject --</option>' + ALL_SUBJECTS.map(s => `<option value="${s}">${s}</option>`).join('');
-            }
-        });
-    }
-
-    // Update student numbers (only available on the public front page)
-    function updateStudentDropdowns() {
-        // Since we load the full student list, this is no longer strictly needed but kept for initial UI setup.
-        // Actual list population would be complex due to the need for class filtering from master list.
-        const studentSelect = document.getElementById('f_student_no');
-        const selectedClassCode = document.getElementById('f_class_select').value;
-        
-        studentSelect.innerHTML = '<option value="">-- Select Student No --</option>';
-
-        const prefixes = { 'F1': 'J', 'F2': 'J', 'F3': 'M', 'F4': 'M' };
-        
-        if (prefixes[selectedClassCode]) {
-             // For simplicity, we just use the keys from the loaded master list
-             // In a real app, this would filter by class or load a class-specific list.
-             const studentNos = Object.keys(STUDENT_MASTER_LIST).filter(no => no.startsWith(prefixes[selectedClassCode]));
-             
-             studentNos.forEach(no => {
-                 const name = STUDENT_MASTER_LIST[no].name;
-                 studentSelect.innerHTML += `<option value="${no}">${no} (${name})</option>`;
-             });
-        }
-    }
-
-    // ============================================== NAVIGATION/PAGE SWITCHING ==============================================
-    let history = ['front-page'];
-
-    function showPage(pageId) {
-        document.querySelectorAll('.page').forEach(page => {
-            page.style.display = 'none';
-        });
-        document.getElementById(pageId).style.display = 'block';
-
-        if (history[history.length - 1] !== pageId) {
-            history.push(pageId);
-        }
-    }
-    
-    document.querySelectorAll('.back-btn').forEach(button => {
-        button.onclick = function() {
-            if (history.length > 1) {
-                history.pop(); 
-            }
-            const previousPageId = history[history.length - 1] || 'front-page';
-            
-            document.querySelectorAll('.page').forEach(page => {
-                page.style.display = 'none';
-            });
-            document.getElementById(previousPageId).style.display = 'block';
-        };
+  // ===== UI/Navigation =====
+  function populateDropdowns(){
+    ["de_class","repo_class","sv_class","gv_class","da_class"].forEach(id=>{
+      const el=document.getElementById(id); if(!el) return;
+      el.innerHTML='<option value="">-- Select Class --</option>'; CLASSES.forEach(c=>el.insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`));
     });
+    const subjSel=document.getElementById('de_subject'); const assignSel=document.getElementById('assign_subject');
+    [subjSel, assignSel].forEach(el=>{
+      if(!el) return; el.innerHTML='<option value="">-- Select Subject --</option>';
+      ALL_SUBJECTS.forEach(s=>el.insertAdjacentHTML('beforeend', `<option value="${s}">${s}</option>`));
+    });
+  }
+  function showPage(id){ document.querySelectorAll('.page').forEach(p=>p.style.display='none'); document.getElementById(id).style.display='block'; }
 
-    // ============================================== LOGIN/PASSWORD LOGIC ==============================================
-    function promptLogin(requiredPassword, nextPageId = 'login-gate') {
-        const password = prompt(`Enter Password for access (Hint: ${requiredPassword}):`);
-        
-        if (password === requiredPassword) {
-            alert("Login Successful! Remember to only use a GitHub Token with write permissions for data uploads.");
-            showPage(nextPageId);
-        } else if (password !== null && password !== "") {
-            alert("Invalid Password.");
-        }
-    }
+  function promptLogin(expectedCode, pageId){
+    const code = prompt("Enter PIN:");
+    if(code === expectedCode){ showPage(pageId); } else if(code){ alert("Invalid PIN."); }
+  }
 
-    // ============================================== FRONT PAGE LOGIC (Real Data Fetch) ==============================================
-    
-    /**
-     * Loads scores for a given class/file and caches them.
-     */
-    async function loadClassScores(classCode) {
-        if (CLASS_SCORES_CACHE[classCode]) {
-            return CLASS_SCORES_CACHE[classCode];
-        }
+  document.getElementById('viewResultsBtn').addEventListener('click', viewResults);
+  window.updateViewTable = function(viewId, selectId, fn){
+    const cls=document.getElementById(selectId).value; if(!cls){ alert("Please select a class first."); return; }
+    fn(cls);
+  };
 
-        const fileName = `${classCode}_scores.csv`;
-        const csvText = await fetchRawFile(fileName);
-        
-        if (!csvText) return null;
-        
-        const parsedData = parseSimpleCsv(csvText);
-        CLASS_SCORES_CACHE[classCode] = parsedData;
-        return parsedData;
-    }
-    
-    /**
-     * Entry point for student/parent view. Authenticates and loads report data.
-     */
-    async function viewResults() {
-        const classValueCode = document.getElementById('f_class_select').value;
-        const studentNo = document.getElementById('f_student_no').value;
-        const dob = document.getElementById('f_dob').value.trim(); 
-        
-        if (!classValueCode || !studentNo || !dob) {
-            alert("Please select Class, Student Number, and enter DOB to view results.");
-            return;
-        }
+  // ===== CSV Upload → students JSON =====
+  async function handleFileUpload(){
+    const cls=document.getElementById('repo_class').value;
+    const fileInput=document.getElementById('csv_file');
+    const token=document.getElementById('repo_token').value.trim();
+    if(!cls) return alert("Select a class.");
+    if(!fileInput.files?.length) return alert("Select a CSV file.");
+    if(!token) return alert("Enter GitHub token.");
+    const text = await fileInput.files[0].text();
+    const rows=text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    const hasHeader=/exam\s*no/i.test(rows[0]) || /student/i.test(rows[0]) || /dob/i.test(rows[0]);
+    const dataRows = hasHeader ? rows.slice(1) : rows;
+    const students = dataRows.map(line=>{
+      const [examNo,name,dob] = line.split(',').map(x=>x.trim());
+      if(!examNo || !name || !dob) return null;
+      return { examNo: examNo.toUpperCase(), name, dob: normalizeDob(dob) };
+    }).filter(Boolean);
+    if(!students.length) return alert("No valid rows found.");
+    try{
+      await ghEnsureWrite(`data/students/${cls}.json`, token, () => students, `Upload ${cls} students (${students.length})`);
+      alert(`Uploaded ${students.length} students to data/students/${cls}.json`);
+    }catch(e){ alert(`Upload failed: ${e.message}`); }
+  }
 
-        // 1. Check Master List for DOB verification
-        if (Object.keys(STUDENT_MASTER_LIST).length === 0) {
-            alert("Loading student authentication data...");
-            await loadMasterList();
-        }
-        
-        const studentInfo = STUDENT_MASTER_LIST[studentNo];
-        if (!studentInfo) {
-            alert("Error: Student Number not found in the master list.");
-            return;
-        }
+  // ===== Teacher assignment → data/teachers.json =====
+  async function handleTeacherAssignment(){
+    const subject=document.getElementById('assign_subject').value;
+    const teacher=document.getElementById('assign_teacher').value.trim();
+    const token=document.getElementById('repo_token').value.trim();
+    if(!token) return alert("Enter GitHub token.");
+    if(!subject) return alert("Select a subject.");
+    if(!teacher) return alert("Enter teacher name.");
+    try{
+      await ghEnsureWrite(`data/teachers.json`, token, (arr)=>{
+        const data = Array.isArray(arr) ? arr : [];
+        const idx=data.findIndex(x=>x.subject===subject);
+        const record={subject, teacher};
+        if(idx>=0) data[idx]=record; else data.push(record);
+        return data;
+      }, `Assign ${teacher} to ${subject}`);
+      alert("Teacher assignment saved.");
+    }catch(e){ alert(`Assignment failed: ${e.message}`); }
+  }
 
-        if (studentInfo.dob !== dob) {
-            alert("Error: Date of Birth does not match the record.");
-            return;
-        }
+  // ===== Student name auto-fill from repo students =====
+  async function updateStudentName(){
+    const cls=document.getElementById('de_class').value;
+    const examNo=document.getElementById('de_exam_no').value.trim().toUpperCase();
+    const token=document.getElementById('de_token').value.trim();
+    const nameField=document.getElementById('de_student_name');
+    if(!cls || !examNo || !token){ nameField.value='Student Not Found'; return; }
+    try{
+      const { data: students } = await ghReadJson(`data/students/${cls}.json`, token);
+      const s = students.find(x=>x.examNo===examNo);
+      nameField.value = s ? s.name : 'Student Not Found';
+    }catch(e){ nameField.value='Student Not Found'; }
+  }
 
-        // 2. Load Class Scores
-        const scoresData = await loadClassScores(classValueCode);
-        if (!scoresData) {
-            alert(`Error: Score data for ${classValueCode} could not be loaded. Please ensure ${classValueCode}_scores.csv exists in the data folder.`);
-            return;
-        }
+  // ===== Submit score → data/scores/Fx_TermN.json =====
+  async function submitScore(){
+    const cls=document.getElementById('de_class').value;
+    const subject=document.getElementById('de_subject').value;
+    const examNo=document.getElementById('de_exam_no').value.trim().toUpperCase();
+    const studentName=document.getElementById('de_student_name').value.trim();
+    const scoreStr=document.getElementById('de_score').value.trim();
+    const term=document.getElementById('de_term').value.replace(/\s+/g,'');
+    const comments=document.getElementById('de_comments').value.trim();
+    const token=document.getElementById('de_token').value.trim();
 
-        // 3. Find student's score row
-        const studentRow = scoresData.data.find(row => row['Exam No'] === studentNo);
-        
-        if (!studentRow) {
-            alert(`Error: Scores for ${studentNo} not found in the ${classValueCode} score file.`);
-            return;
-        }
+    const score=Number(scoreStr);
+    if(!token) return alert("Enter GitHub token.");
+    if(!cls) return alert("Select class.");
+    if(!subject) return alert("Select subject.");
+    if(!examNo) return alert("Enter Exam No.");
+    if(studentName==='Student Not Found') return alert("Student not found for this class.");
+    if(Number.isNaN(score) || score<0 || score>100) return alert("Score must be 0–100.");
 
-        // 4. Transform scores into the required object format {Subject: Score, ...}
-        const studentScores = {};
-        for (const subject of ALL_SUBJECTS) {
-            studentScores[subject] = studentRow[subject] || '-'; 
-        }
-        studentScores['Comments'] = studentRow['Comments'] || "No general comments available.";
+    const isF12 = cls==='F1' || cls==='F2';
+    const grade = isF12 ? getGradeF12(score) : getGradeF34(score);
 
-        // 5. Generate and show report
-        updateProgressViewData(studentNo, classValueCode, studentInfo.name, studentScores);
-        showPage('progressReport'); 
-    }
+    try{
+      await ghEnsureWrite(`data/scores/${cls}_${term}.json`, token, (arr)=>{
+        const data = Array.isArray(arr) ? arr : [];
+        const idx = data.findIndex(r => r.examNo===examNo && r.subject===subject);
+        const record = { examNo, name: studentName, subject, class: cls, term: term.replace('Term','Term '), score, grade, comments };
+        if(idx>=0) data[idx]=record; else data.push(record);
+        return data;
+      }, `Update ${examNo} ${subject} (${cls} ${term})`);
+      alert("✅ Score saved to GitHub.");
+      document.getElementById('de_score').value='';
+      document.getElementById('de_comments').value='';
+    } catch(e){ alert(`Save failed: ${e.message}`); }
+  }
 
+  // ===== Views from repo =====
+  async function updateScoreViewTable(classCode, token){
+    const tbody=document.getElementById("scoreViewBody");
+    tbody.innerHTML=`<tr><td colspan="13">Loading...</td></tr>`;
+    try{
+      const { data: students } = await ghReadJson(`data/students/${classCode}.json`, token);
+      const allScores=[];
+      for(const t of ["Term1","Term2","Term3"]){
+        const path=`data/scores/${classCode}_${t}.json`;
+        try{ const { data } = await ghReadJson(path, token); allScores.push(...data); }catch{}
+      }
+      if(!students.length){ tbody.innerHTML=`<tr><td colspan="13">No students found for ${classCode}.</td></tr>`; return; }
+      const byExam={}; students.forEach(s=>{ byExam[s.examNo]={ examNo:s.examNo, name:s.name }; });
+      allScores.forEach(r=>{ if(!byExam[r.examNo]) byExam[r.examNo]={ examNo:r.examNo, name:r.name }; byExam[r.examNo][r.subject]=r.score; });
+      const rows=Object.values(byExam).sort((a,b)=>a.examNo.localeCompare(b.examNo));
+      tbody.innerHTML="";
+      rows.forEach(row=>{
+        let cells=`<td>${row.examNo}</td><td style="text-align:left">${row.name||""}</td>`;
+        const shortMap = {
+          "Agriculture":"Agri","Bible Knowledge":"BK","Biology":"Bio","Chemistry":"Chem","Chichewa":"Chichewa","English":"Eng",
+          "Geography":"Geo","History":"Hist","Mathematics":"Math","Physics":"Phy","Social":"Social"
+        };
+        ALL_SUBJECTS.forEach(sub=>{ const val=row[sub]; cells += `<td>${val!=null?val:"-"}</td>`; });
+        tbody.insertAdjacentHTML("beforeend", `<tr>${cells}</tr>`);
+      });
+    }catch(e){ tbody.innerHTML=`<tr><td colspan="13">Error: ${e.message}</td></tr>`; }
+  }
 
-    // ============================================== DATA ENTRY/UPLOAD LOGIC (GitHub API) ==============================================
-    
-    /**
-     * Updates the score and comments in the CSV content string.
-     */
-    function updateCsvContent(currentContent, examNo, subject, newScore, newComments) {
-        const lines = currentContent.trim().split('\n');
-        const headers = lines[0].split(',').map(h => h.trim());
-        const examNoIndex = headers.indexOf('Exam No');
-        const subjectIndex = headers.indexOf(subject);
-        const commentsIndex = headers.indexOf('Comments'); 
-
-        if (examNoIndex === -1 || subjectIndex === -1) {
-            alert("Error: CSV Headers missing 'Exam No' or the selected Subject.");
-            return null; 
-        }
-        
-        let newLines = [lines[0]]; 
-        let found = false;
-        
-        for (let i = 1; i < lines.length; i++) {
-            const values = lines[i].split(',');
-            // Trim values before comparison
-            const trimmedValues = values.map(v => v.trim()); 
-            
-            if (trimmedValues[examNoIndex] === examNo) {
-                // Found the row, update score and comments
-                // Use original values for unedited cells to preserve formatting/spacing
-                values[subjectIndex] = newScore;
-                if (commentsIndex !== -1) {
-                   // Clean comments to remove internal commas and newlines
-                   values[commentsIndex] = `"${newComments.replace(/"/g, '""').replace(/[\r\n]/g, ' ')}"`; 
-                }
-                newLines.push(values.join(','));
-                found = true;
-            } else {
-                newLines.push(lines[i]);
-            }
-        }
-        
-        if (!found) {
-             alert("Student row not found in the CSV file for update.");
-             return null; 
-        }
-
-        return newLines.join('\n');
-    }
-    
-    /**
-     * Commits score and comment changes back to the GitHub repo.
-     */
-    async function saveAndUploadData() {
-        const classCode = document.getElementById('de_class').value;
-        const examNo = document.getElementById('de_exam_no').value.trim();
-        const subject = document.getElementById('de_subject').value;
-        const score = document.getElementById('de_score').value;
-        const comments = document.getElementById('de_comments').value;
-        const token = document.getElementById('de_token').value;
-        
-        if (!classCode || !examNo || !subject || !score || !token) {
-            alert("Class, Exam No, Subject, Score, and GitHub Token are required.");
-            return;
-        }
-        
-        const filePath = `${DATA_PATH}${classCode}_scores.csv`; 
-        
-        try {
-            // 1. Get the current file content (required to get the SHA)
-            const getUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${filePath}`;
-            const getResponse = await fetch(getUrl, {
-                headers: { 'Authorization': `token ${token}` }
-            });
-            
-            if (!getResponse.ok) {
-                 const error = await getResponse.json();
-                 throw new Error(`Failed to fetch current file content. Status: ${getResponse.status}. ${error.message}`);
-            }
-            
-            const fileData = await getResponse.json();
-            const currentContent = atob(fileData.content); 
-            const sha = fileData.sha;
-
-            // 2. Modify the content 
-            const newContent = updateCsvContent(currentContent, examNo, subject, score, comments);
-            if (!newContent) return; // Stop if updateCsvContent failed (e.g., header missing)
-
-            const encodedNewContent = btoa(newContent); 
-
-            // 3. Commit the new content
-            const commitUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${filePath}`;
-            const commitBody = JSON.stringify({
-                message: `Portal Update: ${examNo} - ${subject} score to ${score}`,
-                content: encodedNewContent,
-                sha: sha, // Required for updating an existing file
-                committer: {
-                    name: 'MagawaPortal',
-                    email: 'portal@magawass.edu'
-                }
-            });
-
-            const commitResponse = await fetch(commitUrl, {
-                method: 'PUT',
-                headers: { 
-                    'Authorization': `token ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: commitBody
-            });
-
-            if (commitResponse.ok) {
-                // Clear cache so next view loads the updated file
-                delete CLASS_SCORES_CACHE[classCode]; 
-                alert(`Score for ${examNo} in ${subject} submitted and uploaded successfully!`);
-            } else {
-                const error = await commitResponse.json();
-                alert(`Upload failed: ${error.message || 'Unknown error'}. Check your token permissions (must have 'repo' scope).`);
-            }
-
-        } catch (error) {
-            console.error(error);
-            alert("An error occurred during GitHub interaction. Check your token, network, and ensure your CSV headers are correct.");
-        }
-    }
-    
-    // ============================================== DATA ENTRY NAME LOOKUP ==============================================
-    async function updateStudentName() {
-        const examNo = document.getElementById('de_exam_no').value.trim();
-        const nameField = document.getElementById('de_student_name');
-        
-        if (Object.keys(STUDENT_MASTER_LIST).length === 0) {
-            await loadMasterList();
-        }
-
-        const student = STUDENT_MASTER_LIST[examNo];
-        if (student) {
-            nameField.value = student.name;
-        } else {
-            nameField.value = 'Student Not Found';
-        }
-    }
-
-
-    // ============================================== PROGRESS VIEW LOGIC (REPORT GENERATION) ==============================================
-    
-    function updateProgressViewData(studentNo, classValueCode, studentName, studentScores) {
-        
-        const isF12 = (classValueCode === 'F1' || classValueCode === 'F2');
-        const classValueText = ALL_CLASSES.find(c => c.replace(' ', '') === classValueCode);
-
-        // A. Update Student Info 
-        document.getElementById('reportStudentName').innerText = studentName;
-        document.getElementById('reportExamNo').innerText = studentNo;
-        document.getElementById('reportForm').innerText = classValueText;
-        document.getElementById('reportTerm').innerText = '2'; 
-        document.getElementById('reportSummaryClassText').innerText = classValueCode;
-
-        // B. Update Main Results Table - ITERATE OVER ALL SUBJECTS
-        let resultsHTML = '';
-        let totalScore = 0;
-        let subjectsCounted = 0; 
-        const getGrade = isF12 ? getGradeF12 : getGradeF34;
-        const getRemark = isF12 ? getRemarkF12 : getRemarkF34;
-
-        for (const subject of ALL_SUBJECTS) {
-            const score = studentScores[subject] || '-'; 
-            const grade = getGrade(score);
-            const remark = getRemark(grade);
-            const position = (score !== '-' && score > 0) ? '1/30 (Sim)' : '-'; 
-            const teacher = 'Mr. Tembo (Sim)'; // Needs to be sourced from teacher assignment list
-
-            resultsHTML += `
-                <tr>
-                    <td style="text-align: left;">${subject}</td> 
-                    <td>${score}</td>
-                    <td>${grade}</td>
-                    <td>${position}</td>
-                    <td style="text-align: left;">${remark}</td>
-                    <td>${teacher}</td>
-                </tr>
-            `;
-            if (score !== '-' && parseInt(score) > 0) {
-                totalScore += parseInt(score);
-                subjectsCounted++;
-            }
-        }
-        document.getElementById('reportBody').innerHTML = resultsHTML;
-
-        // C. Update Summary and Aggregate/Total Blocks
-        document.getElementById('aggregateLine').classList.toggle('hidden', isF12);
-        document.getElementById('averageLine').classList.toggle('hidden', !isF12);
-        document.getElementById('totalLine').classList.toggle('hidden', !isF12);
-
-        if (isF12) {
-            document.getElementById('reportTotal').innerText = totalScore;
-            document.getElementById('reportAverage').innerText = (subjectsCounted > 0 ? (totalScore / subjectsCounted).toFixed(1) : 0) + '%';
-        } else {
-            const aggregate = calculateAggregate(studentScores);
-            document.getElementById('reportAggregate').innerText = aggregate;
-        }
-
-        // D. Update Overall Remark (Pass/Fail)
-        const overallRemark = getOverallRemark(studentScores, isF12);
-        document.getElementById('reportPosition').innerText = '1/30 (Sim)'; 
-        document.getElementById('reportOverallRemark').innerText = overallRemark;
-        document.getElementById('reportOverallRemark').style.color = overallRemark === 'PASS' ? 'green' : 'red';
-        
-        // E. Update Grading Scale Table
-        document.getElementById('reportScaleClassText').innerText = isF12 ? 'F1 & F2' : 'F3 & F4';
-        let scaleHTML = '';
-
-        if (isF12) {
-            scaleHTML = `
-                <tr><td>80-100</td><td>A</td><td>Excellent</td></tr>
-                <tr><td>65-79</td><td>B</td><td>Very good</td></tr>
-                <tr><td>55-64</td><td>C</td><td>Good</td></tr>
-                <tr><td>40-54</td><td>D</td><td>Average</td></tr>
-                <tr><td>0-39</td><td>F</td><td>Fail</td></tr>
-            `;
-        } else {
-            scaleHTML = `
-                <tr><td>80-100</td><td>1</td><td>Distinction</td></tr>
-                <tr><td>75-79</td><td>2</td><td>Distinction</td></tr>
-                <tr><td>70-74</td><td>3</td><td>Strong credit</td></tr>
-                <tr><td>65-69</td><td>4</td><td>Strong credit</td></tr>
-                <tr><td>60-64</td><td>5</td><td>Credit</td></tr>
-                <tr><td>55-59</td><td>6</td><td>Credit</td></tr>
-                <tr><td>45-54</td><td>7</td><td>Pass</td></tr>
-                <tr><td>35-44</td><td>8</td><td>Pass</td></tr>
-                <tr><td>0-34</td><td>9</td><td>Fail</td></tr>
-            `;
-        }
-        document.getElementById('reportGradeScaleBody').innerHTML = scaleHTML;
-        
-        // F. Update Comment (Sourced from the CSV row's 'Comments' column)
-        document.getElementById('reportComment').innerText = studentScores['Comments'] || "No general comments available. Please see your class teacher for feedback.";
-    }
-
-    // Teacher/Admin function to view any student report
-    async function progressViewSelection() {
-        const examNo = prompt("Enter Exam No (from your master list) to view Progress Report:");
-        if (examNo) {
-            if (Object.keys(STUDENT_MASTER_LIST).length === 0) {
-                alert("Loading master list...");
-                await loadMasterList();
-            }
-            
-            const studentInfo = STUDENT_MASTER_LIST[examNo];
-            if (!studentInfo) {
-                alert("Student not found in master list.");
-                return;
-            }
-
-            // Determine class code based on Exam No prefix (simplistic)
-            let classCode = examNo.startsWith('J') ? 'F1' : (examNo.startsWith('M') ? 'F3' : null);
-            if (!classCode) {
-                 alert("Could not determine class code from Exam No prefix.");
-                 return;
-            }
-
-            const scoresData = await loadClassScores(classCode);
-            if (!scoresData) {
-                alert(`Error: Score data for ${classCode} could not be loaded.`);
-                return;
-            }
-
-            const studentRow = scoresData.data.find(row => row['Exam No'] === examNo);
-            
-            if (studentRow) {
-                const studentScores = {};
-                for (const subject of ALL_SUBJECTS) {
-                    studentScores[subject] = studentRow[subject] || '-'; 
-                }
-                studentScores['Comments'] = studentRow['Comments'] || "No general comments available.";
-
-                updateProgressViewData(examNo, classCode, studentInfo.name, studentScores);
-                showPage('progressReport'); 
-            } else {
-                alert("Scores not found for that Exam No in the class file.");
-            }
-        }
-    }
-    
-    // ============================================== PORTAL VIEW LOGIC (Scores/Grades) ==============================================
-
-    /**
-     * Updates the Score View table with data from the repo.
-     */
-    async function viewScores() {
-        const classCode = document.getElementById('sv_class').value;
-        if (!classCode) return alert("Please select a Class.");
-        
-        const scoresData = await loadClassScores(classCode);
-        const scoreBody = document.querySelector('#score-view table tbody');
-        scoreBody.innerHTML = ''; // Clear existing content
-
-        if (!scoresData || scoresData.data.length === 0) {
-            scoreBody.innerHTML = '<tr><td colspan="13">No scores found for this class. Ensure the file is named correctly in the data folder.</td></tr>';
-            return;
-        }
-        
-        let html = '';
-        scoresData.data.forEach(row => {
-            html += '<tr>';
-            html += `<td>${row['Exam No'] || '-'}</td>`;
-            html += `<td style="text-align: left;">${row['Name'] || '-'}</td>`; 
-            
-            // Generate columns for the 11 subjects
-            ALL_SUBJECTS.forEach(subject => {
-                html += `<td>${row[subject] || '-'}</td>`; 
-            });
-            html += '</tr>';
+  async function updateGradeViewExample(classCode, token){
+    const tbody=document.getElementById("gradeViewBody");
+    tbody.innerHTML=`<tr><td colspan="14">Loading...</td></tr>`;
+    try{
+      const { data: students } = await ghReadJson(`data/students/${classCode}.json`, token);
+      const allScores=[];
+      for(const t of ["Term1","Term2","Term3"]){
+        const path=`data/scores/${classCode}_${t}.json`;
+        try{ const { data } = await ghReadJson(path, token); allScores.push(...data); }catch{}
+      }
+      if(!students.length){ tbody.innerHTML=`<tr><td colspan="14">No students found for ${classCode}.</td></tr>`; return; }
+      const isF12 = classCode==="F1" || classCode==="F2";
+      const getGrade = isF12 ? getGradeF12 : getGradeF34;
+      const byExam={}; students.forEach(s=>{ byExam[s.examNo]={ examNo:s.examNo, name:s.name, subjects:{} }; });
+      allScores.forEach(r=>{ if(!byExam[r.examNo]) byExam[r.examNo]={ examNo:r.examNo, name:r.name, subjects:{} }; byExam[r.examNo].subjects[r.subject]=r.score; });
+      const rows=Object.values(byExam);
+      rows.forEach(row=>{
+        row.total = ALL_SUBJECTS.reduce((sum,sub)=>sum+(row.subjects[sub]||0),0);
+        row.aggregate = isF12 ? row.total : calculateAggregate(row.subjects);
+      });
+      rows.sort((a,b)=>b.total-a.total);
+      tbody.innerHTML="";
+      rows.forEach(row=>{
+        let cells=`<td>${row.examNo}</td><td style="text-align:left">${row.name||""}</td>`;
+        ALL_SUBJECTS.forEach(sub=>{
+          const s=row.subjects[sub]; const g = s ? getGrade(s) : "-";
+          cells+=`<td>${g}</td>`;
         });
-        scoreBody.innerHTML = html;
-        // alert(`Successfully loaded ${scoresData.data.length} records for ${classCode}.`); // Too noisy
-    }
+        cells += `<td>${isF12 ? row.total : row.aggregate}</td>`;
+        tbody.insertAdjacentHTML("beforeend", `<tr>${cells}</tr>`);
+      });
+    }catch(e){ tbody.innerHTML=`<tr><td colspan="14">Error: ${e.message}</td></tr>`; }
+  }
 
-    /**
-     * Updates the Grade View table with data from the repo.
-     */
-    async function viewGrades() {
-        const classCode = document.getElementById('gv_class').value;
-        if (!classCode) return alert("Please select a Class.");
-        
-        const scoresData = await loadClassScores(classCode);
-        const gradeBody = document.querySelector('#grade-view table tbody');
-        gradeBody.innerHTML = ''; // Clear existing content
+  async function updateDataAnalysisTable(classCode, token){
+    const container=document.getElementById("analysisTableContainer");
+    container.innerHTML=`<p>Loading analysis...</p>`;
+    try{
+      const allScores=[];
+      for(const t of ["Term1","Term2","Term3"]){
+        const path=`data/scores/${classCode}_${t}.json`;
+        try{ const { data } = await ghReadJson(path, token); allScores.push(...data); }catch{}
+      }
+      if(!allScores.length){ container.innerHTML=`<p>No scores found for ${classCode}.</p>`; return; }
+      const isF12 = classCode==="F1" || classCode==="F2";
+      const getGrade = isF12 ? getGradeF12 : getGradeF34;
+      const gradeRows = isF12 ? ["A","B","C","D","F"] : ["1","2","3","4","5","6","8","9"];
+      const analysis={}; ALL_SUBJECTS.forEach(sub=>{ analysis[sub]={ Total:0, Pass:0, Fail:0 }; gradeRows.forEach(g=>analysis[sub][g]=0); });
+      allScores.forEach(r=>{
+        const g=getGrade(r.score).toString();
+        if(analysis[r.subject]){ analysis[r.subject].Total++; if(analysis[r.subject][g]!=null) analysis[r.subject][g]++; if(isSubjectPass(g,isF12)) analysis[r.subject].Pass++; else analysis[r.subject].Fail++; }
+      });
+      let html = `<table id="analysisTable"><thead><tr><th>Subject</th>`;
+      ALL_SUBJECTS.forEach(sub=>{ html+=`<th>${sub}</th>`; }); html+=`</tr></thead><tbody>`;
+      gradeRows.forEach(g=>{ html+=`<tr><td>Grade ${g}</td>`; ALL_SUBJECTS.forEach(sub=>{ html+=`<td>${analysis[sub][g]}</td>`; }); html+=`</tr>`; });
+      html+=`<tr><td>Pass</td>`; ALL_SUBJECTS.forEach(sub=>{ html+=`<td>${analysis[sub].Pass}</td>`; }); html+=`</tr>`;
+      html+=`<tr><td>Fail</td>`; ALL_SUBJECTS.forEach(sub=>{ html+=`<td>${analysis[sub].Fail}</td>`; }); html+=`</tr></tbody></table>`;
+      container.innerHTML=html;
+    }catch(e){ container.innerHTML=`<p>Error: ${e.message}</p>`; }
+  }
 
-        if (!scoresData || scoresData.data.length === 0) {
-            gradeBody.innerHTML = '<tr><td colspan="14">No grades found for this class. Ensure the file is named correctly in the data folder.</td></tr>';
-            return;
-        }
+  // ===== Front page student view (authenticate via repo) =====
+  async function viewResults(){
+    const classCode=document.getElementById('f_class_select').value;
+    const examNo=document.getElementById('f_student_no').value.trim().toUpperCase();
+    const dobInput=document.getElementById('f_dob').value.trim();
+    const token=document.getElementById('repo_token')?.value.trim() || "";
+    if(!classCode || !examNo || !dobInput) return alert("Please select a class, enter Exam No, and DOB.");
+    try{
+      const { data: students } = await ghReadJson(`data/students/${classCode}.json`, token);
+      const student = students.find(s=>s.examNo.toUpperCase()===examNo);
+      if(!student) return alert("Student not found.");
+      const dob = dobInput.includes('/') ? normalizeDob(dobInput) : dobInput;
+      if(student.dob !== dob) return alert("DOB does not match our records.");
+      const termText=document.getElementById('reportTerm').textContent.trim(); // e.g., 'Term 2'
+      const termKey=termText.replace(/\s+/g,''); // 'Term2'
+      const { data: scores } = await ghReadJson(`data/scores/${classCode}_${termKey}.json`, token);
+      const records=scores.filter(r=>r.examNo.toUpperCase()===examNo);
+      if(!records.length) return alert("No scores found yet.");
+      await updateProgressViewData(student, records, classCode, termText, token);
+      showPage('progressReport');
+    }catch(e){ alert(`Error: ${e.message}`); }
+  }
 
-        const isF12 = (classCode === 'F1' || classCode === 'F2');
-        const getGrade = isF12 ? getGradeF12 : getGradeF34;
+  // ===== Progress report (with teacher assignments) =====
+  async function updateProgressViewData(student, records, classCode, term, token){
+    document.getElementById('reportStudentName').innerText = student.name;
+    document.getElementById('reportExamNo').innerText = student.examNo;
+    document.getElementById('reportForm').innerText = classCode;
+    document.getElementById('reportTerm').innerText = term;
+    document.getElementById('reportSummaryClassText').innerText = classCode;
+    document.getElementById('reportGradeKeyFor').innerText = classCode;
 
-        let html = '';
-        scoresData.data.forEach(row => {
-            let subjectScores = {};
-            let totalScore = 0;
-            let subjectsCounted = 0;
+    let teachers=[]; const teacherBySubject={};
+    try{ const { data } = await ghReadJson(`data/teachers.json`, token); teachers = Array.isArray(data) ? data : []; }catch(e){}
+    teachers.forEach(t=>teacherBySubject[t.subject]=t.teacher);
 
-            html += '<tr>';
-            html += `<td>${row['Exam No'] || '-'}</td>`;
-            html += `<td style="text-align: left;">${row['Name'] || '-'}</td>`; 
-            
-            // Get grades and calculate aggregate/total
-            ALL_SUBJECTS.forEach(subject => {
-                const score = row[subject] || '-';
-                const grade = getGrade(score);
-                html += `<td>${grade}</td>`;
-                
-                if (score !== '-' && parseInt(score) > 0) {
-                    subjectScores[subject] = parseInt(score);
-                    totalScore += parseInt(score);
-                    subjectsCounted++;
-                }
-            });
-            
-            let finalResult;
-            if (isF12) {
-                finalResult = `${totalScore} (Tot)`;
-            } else {
-                finalResult = `${calculateAggregate(subjectScores)} (Agg)`;
-            }
+    const isF12 = classCode==="F1" || classCode==="F2";
+    const getGrade = isF12 ? getGradeF12 : getGradeF34;
+    const getRemark = isF12 ? getRemarkF12 : getRemarkF34;
 
-            html += `<td>**${finalResult}**</td>`;
-            html += '</tr>';
-        });
-        gradeBody.innerHTML = html;
-        // alert(`Successfully calculated and displayed grades/aggregates for ${scoresData.data.length} records.`); // Too noisy
-    }
+    let resultsHTML=''; let totalScore=0;
+    records.forEach(r=>{
+      totalScore+=r.score;
+      const grade=getGrade(r.score);
+      const remark=getRemark(grade);
+      const teacher=teacherBySubject[r.subject] || "-";
+      resultsHTML += `<tr>
+        <td style="text-align:left; font-weight:bold;">${r.subject}</td>
+        <td>${r.score}</td>
+        <td>${grade}</td>
+        <td>-</td>
+        <td style="text-align:left;">${remark}</td>
+        <td>${teacher}</td>
+      </tr>`;
+    });
+    document.getElementById('reportBody').innerHTML=resultsHTML;
 
+    const scoresBySubject = Object.fromEntries(records.map(r=>[r.subject, r.score]));
+    const avg=(totalScore/records.length).toFixed(1);
+    const overallRemark = (()=>{
+      // Use your pass rule: 6+ passes including English
+      let passed=0, englishPass=false;
+      ALL_SUBJECTS.forEach(sub=>{
+        const s=scoresBySubject[sub]||0;
+        if(!s) return;
+        const g=isF12 ? getGradeF12(s) : getGradeF34(s);
+        if(isSubjectPass(g,isF12)){ passed++; if(sub==='English') englishPass=true; }
+      });
+      return (passed>=6 && englishPass) ? 'PASS' : 'FAIL';
+    })();
+    const aggregate = isF12 ? 'N/A' : calculateAggregate(scoresBySubject);
 
-    // ============================================== INITIALIZATION ==============================================
-    
-    // Initialize dropdowns and load master list on load
-    window.onload = async function() {
-        populateDropdowns();
-        // Load master list for fast lookups later
-        await loadMasterList();
-        updateStudentDropdowns(); // Populate the student dropdown after list loads
-    };
+    document.getElementById('reportSummaryTotalScore').innerText=totalScore;
+    document.getElementById('reportSummaryAverageScore').innerText=avg;
+    document.getElementById('reportSummaryOverallRank').innerText='-';
+    document.getElementById('reportSummaryOverallRemark').innerText=overallRemark;
+    document.getElementById('reportSummaryAggregate').innerText=aggregate;
 
+    const gradeScaleBody=document.getElementById('reportGradeScaleBody');
+    gradeScaleBody.innerHTML = isF12
+      ? `<tr><td>80–100</td><td>A</td><td>Excellent</td></tr>
+         <tr><td>65–79</td><td>B</td><td>Very Good</td></tr>
+         <tr><td>55–64</td><td>C</td><td>Good</td></tr>
+         <tr><td>40–54</td><td>D</td><td>Satisfactory</td></tr>
+         <tr><td>0–39</td><td>F</td><td>Fail</td></tr>`
+      : `<tr><td>90–100</td><td>1</td><td>Distinction</td></tr>
+         <tr><td>80–89</td><td>2</td><td>Distinction</td></tr>
+         <tr><td>70–79</td><td>3</td><td>Strong Credit</td></tr>
+         <tr><td>60–69</td><td>4</td><td>Strong Credit</td></tr>
+         <tr><td>55–59</td><td>5</td><td>Credit</td></tr>
+         <tr><td>50–54</td><td>6</td><td>Credit</td></tr>
+         <tr><td>40–49</td><td>8</td><td>Pass</td></tr>
+         <tr><td>0–39</td><td>9</td><td>Fail</td></tr>`;
+
+    const savedComment = records[0]?.comments || "No comment available.";
+    document.getElementById('reportComment').innerText = savedComment;
+  }
+
+  // ===== Simulate progress view for admin/teacher (choose any student) =====
+  async function simulateProgressViewSelection(){
+    const token=document.getElementById('repo_token')?.value.trim() || "";
+    const cls = prompt("Enter class (F1/F2/F3/F4):","F3"); if(!cls) return;
+    try{
+      const { data: students } = await ghReadJson(`data/students/${cls}.json`, token);
+      if(!students.length) return alert(`No students found in ${cls}.`);
+      const example=students[0];
+      const examNo = prompt(`Enter Exam No for Progress Report View (e.g., ${example.examNo}):`, example.examNo);
+      if(!examNo) return;
+      const termText=document.getElementById('reportTerm').textContent.trim();
+      const termKey=termText.replace(/\s+/g,'');
+      const { data: scores } = await ghReadJson(`data/scores/${cls}_${termKey}.json`, token);
+      const records = scores.filter(r=>r.examNo.toUpperCase()===examNo.toUpperCase());
+      if(!records.length) return alert("No scores found for that Exam No.");
+      await updateProgressViewData({ name: example.name, examNo: examNo.toUpperCase() }, records, cls, termText, token);
+      showPage('progressReport');
+    }catch(e){ alert(`Error: ${e.message}`); }
+  }
+
+  // ===== On load =====
+  window.onload = function(){
+    populateDropdowns();
+    showPage('front-page');
+  };
 </script>
-
 </body>
 </html>
