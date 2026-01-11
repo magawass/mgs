@@ -1,1 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assessment Program For LUBAINI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #fff; }
+        .no-print { background: #f4f4f4; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #ccc; line-height: 1.8; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; table-layout: fixed; }
+        th, td { border: 1px solid #000; padding: 4px; text-align: center; font-size: 10px; word-wrap: break-word; }
+        th { background-color: #e2e2e2; }
+        .header-title { text-align: center; font-weight: bold; text-decoration: underline; font-size: 18px; margin-bottom: 5px; }
+        .sub-header { text-align: center; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; }
+        input[type="number"] { width: 40px; border: 1px solid #ccc; padding: 2px; border-radius: 3px; }
+        .final-col { font-weight: bold; background-color: #f9f9f9; width: 60px; }
+        .gh-controls { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #aaa; display: flex; gap: 10px; flex-wrap: wrap; }
+        .pagination { margin: 15px 0; text-align: center; display: none; }
+        .pagination button { padding: 5px 15px; cursor: pointer; }
+        #viewTableSection { display: none; }
+        #scoresReportTable td, #scoresReportTable th { border: 1px solid #000 !important; }
+        /* Search Box Style */
+        #searchBox { padding: 5px; width: 250px; border: 1px solid #007bff; border-radius: 4px; margin-left: 10px; }
+
+        .print-footer { display: none; }
+        @media print { 
+            .no-print, .pagination, #toggleBtn { display: none !important; } 
+            body { margin: 0; padding-bottom: 50px; }
+            #viewTableSection { display: block !important; }
+            #entrySection { display: none !important; }
+            .print-footer { display: block; position: fixed; bottom: 0; left: 0; right: 0; text-align: center; font-size: 10px; }
+            .page-number:after { content: "Page " counter(page); }
+        }
+        @page { counter-increment: page; margin: 0.5cm; }
+    </style>
+</head>
+<body>
+
+<div class="no-print">
+    <h3>Admin Controls</h3>
+    <div style="margin-bottom: 10px;">
+        <label>Authorization Code:</label>
+        <input type="password" id="ghToken" placeholder="Enter Code" style="width: 200px;">
+        <input type="text" id="searchBox" placeholder="Search Name or Exam No..." oninput="updateView()">
+    </div>
+
+    <label>Class:</label>
+    <select id="selectClass" onchange="updateView()">
+        <option value="1">Form 1</option><option value="2">Form 2</option>
+        <option value="3">Form 3</option><option value="4">Form 4</option>
+    </select>
+
+    <label>Term:</label>
+    <select id="selectTerm" onchange="updateView()">
+        <option value="1">Term 1</option><option value="2">Term 2</option><option value="3">Term 3</option>
+    </select>
+
+    <label>Year:</label>
+    <select id="selectYear" onchange="updateView()">
+        <script>for(let y=2024; y<=2030; y++) document.write(`<option value="${y}">${y}</option>`);</script>
+    </select>
+
+    <label>Subject:</label>
+    <select id="selectSubject" onchange="updateView()">
+        <option>Agriculture</option><option>Bible Knowledge</option><option>Biology</option>
+        <option>Chemistry</option><option>Chichewa</option><option>English</option>
+        <option>Geography</option><option>History</option><option>Mathematics</option>
+        <option>Physics</option><option>Social</option>
+    </select>
+    <hr>
+    
+    <label>Upload Year Roster (ID, Name): </label>
+    <input type="file" id="csvFile" accept=".csv"><br>
+    
+    <label>Max Marks (P1-P4):</label>
+    <input type="number" id="t1" value="20" oninput="updateView()"> 
+    <input type="number" id="t2" value="80" oninput="updateView()"> 
+    <input type="number" id="t3" value="0" oninput="updateView()">
+    <input type="number" id="t4" value="100" oninput="updateView()">
+
+    <div class="gh-controls">
+        <button onclick="loadFromGitHub()" style="background:#007bff; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer;">Load Data</button>
+        <button id="toggleBtn" onclick="toggleMode()" style="background:#f39c12; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer;">View Scores Table</button>
+        <button onclick="saveToGitHub()" style="background:#2ea44f; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer;">Save ALL</button>
+        <button onclick="window.print()" style="background:#1a73e8; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer;">Print Report</button>
+    </div>
+</div>
+
+<div class="header-title">CONTINUOUS ASSESSMENT PROGRAM FOR LUBAINI</div>
+<div class="sub-header" id="dynamicSubHeader">FORM 1 - TERM 1 - 2024 - AGRICULTURE</div>
+
+<div class="print-footer"><span class="page-number"></span></div>
+
+<div id="entrySection">
+    <table>
+        <thead>
+            <tr>
+                <th style="width:50px;">SERIAL NO.</th><th>STUDENT NAME</th>
+                <th id="h1">CA1</th><th id="h2">CA2</th><th id="h3">CA3</th><th id="h4">CA4</th>
+                <th class="final-col">FINAL SCORE(%)</th>
+            </tr>
+        </thead>
+        <tbody id="dataTable"></tbody>
+    </table>
+</div>
+
+<div id="viewTableSection">
+    <table id="scoresReportTable">
+        <thead>
+            <tr>
+                <th rowspan="2" style="width:30px;">S/N</th>
+                <th rowspan="2" style="width:180px;">STUDENT NAME</th>
+                <th rowspan="2" style="width:30px;">SEX</th>
+                <th colspan="5">TERM 1</th>
+                <th colspan="5">TERM 2</th>
+                <th colspan="4">TERM 3</th>
+                <th rowspan="2">E.O.Y AGGR</th>
+            </tr>
+            <tr>
+                <th style="width:30px;">SEPT</th><th>OCT</th><th>NOV</th><th>DEC</th><th>TERM1 SCORE</th>
+                <th style="width:30px;">JAN</th><th>FEB</th><th>MAR</th><th>APR</th><th>TERM2 SCORE</th>
+                <th style="width:30px;">MAY</th><th>JUN</th><th>JULY</th><th>TERM3 SCORE</th>
+            </tr>
+        </thead>
+        <tbody id="viewTableBody"></tbody>
+    </table>
+    <div class="pagination" id="pageControls">
+        <button onclick="changePage(-1)">Previous</button>
+        <span id="pageInfo">Page 1</span>
+        <button onclick="changePage(1)">Next</button>
+    </div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('csvFile');
+    const tableBody = document.getElementById('dataTable');
+    let masterData = {}; 
+    let currentPage = 0;
+    const pageSize = 20;
+    let isViewMode = false;
+
+    function toggleMode() {
+        isViewMode = !isViewMode;
+        document.getElementById('entrySection').style.display = isViewMode ? 'none' : 'block';
+        document.getElementById('viewTableSection').style.display = isViewMode ? 'block' : 'none';
+        document.getElementById('pageControls').style.display = isViewMode ? 'block' : 'none';
+        document.getElementById('toggleBtn').innerText = isViewMode ? 'Back to Entry' : 'View Scores Table';
+        if(isViewMode) updateView();
+    }
+
+    function updateView() {
+        const f = document.getElementById('selectClass').value;
+        const t = document.getElementById('selectTerm').value;
+        const y = document.getElementById('selectYear').value;
+        const s = document.getElementById('selectSubject').value;
+        const key = getStorageKey();
+        
+        document.getElementById('dynamicSubHeader').innerText = `FORM ${f} - TERM ${t} - ${y} - ${s}`;
+        
+        if (!isViewMode) {
+            document.getElementById('h1').innerText = `P1 / ${document.getElementById('t1').value}`;
+            document.getElementById('h2').innerText = `P2 / ${document.getElementById('t2').value}`;
+            document.getElementById('h3').innerText = `P3 / ${document.getElementById('t3').value}`;
+            document.getElementById('h4').innerText = `P4 / ${document.getElementById('t4').value}`;
+            renderEntryTable(key);
+        } else {
+            renderViewTable(key);
+        }
+    }
+
+    async function loadFromGitHub() {
+        const token = document.getElementById('ghToken').value;
+        if (!token) return alert("Enter Code");
+        const key = getStorageKey();
+        const yearRosterKey = getYearRosterKey();
+        
+        try {
+            let res = await fetch(`https://api.github.com/repos/magawass/ExApp/contents/${key}.csv`, { headers: {'Authorization': `token ${token}`} });
+            if (res.ok) {
+                const d = await res.json();
+                masterData[key] = parseCSV(atob(d.content));
+                updateView();
+            } else {
+                let resRoster = await fetch(`https://api.github.com/repos/magawass/ExApp/contents/${yearRosterKey}.csv`, { headers: {'Authorization': `token ${token}`} });
+                if (resRoster.ok) {
+                    const d = await resRoster.json();
+                    masterData[key] = parseCSV(atob(d.content));
+                    updateView();
+                } else {
+                    masterData[key] = [];
+                    updateView();
+                    alert("No data or roster found for this class/year. Please upload a CSV.");
+                }
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    function parseCSV(text) {
+        const rows = text.trim().split('\n');
+        const data = [];
+        for (let i = 1; i < rows.length; i++) {
+            const cols = rows[i].split(',');
+            if (cols.length >= 2) {
+                data.push({
+                    id: cols[0].trim(), name: cols[1].trim(),
+                    p1: cols[2] || "", p2: cols[3] || "",
+                    p3: cols[4] || "", p4: cols[5] || "",
+                    sex: cols[6] || "F"
+                });
+            }
+        }
+        return data;
+    }
+
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        const key = getStorageKey();
+        reader.onload = function(event) {
+            const rows = event.target.result.split('\n');
+            masterData[key] = [];
+            rows.forEach(row => {
+                const cols = row.split(',');
+                if (cols.length >= 2 && cols[1].trim() !== "" && !cols[1].toLowerCase().includes("name")) {
+                    masterData[key].push({ id: cols[0].trim(), name: cols[1].trim(), p1:"", p2:"", p3:"", p4:"", sex:"F" });
+                }
+            });
+            updateView();
+            alert("Roster uploaded locally. Click 'Save' to sync across year/terms.");
+        };
+        reader.readAsText(file);
+    });
+
+    function renderEntryTable(key) {
+        tableBody.innerHTML = '';
+        if (!masterData[key]) return;
+        
+        const query = document.getElementById('searchBox').value.toLowerCase();
+        
+        masterData[key].forEach((std, idx) => {
+            // Search Filtering Logic
+            if (std.name.toLowerCase().includes(query) || std.id.toLowerCase().includes(query)) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${std.id}</td><td>${std.name}</td>
+                    <td><input type="number" class="p1" value="${std.p1}" oninput="updateScore(${idx}, 'p1', this, '${key}')"></td>
+                    <td><input type="number" class="p2" value="${std.p2}" oninput="updateScore(${idx}, 'p2', this, '${key}')"></td>
+                    <td><input type="number" class="p3" value="${std.p3}" oninput="updateScore(${idx}, 'p3', this, '${key}')"></td>
+                    <td><input type="number" class="p4" value="${std.p4}" oninput="updateScore(${idx}, 'p4', this, '${key}')"></td>
+                    <td class="res final-col">0</td>`;
+                tableBody.appendChild(tr);
+                calcEntryRow(tr);
+            }
+        });
+    }
+
+    function renderViewTable(key) {
+        const viewBody = document.getElementById('viewTableBody');
+        viewBody.innerHTML = '';
+        const allData = masterData[key] || [];
+        const query = document.getElementById('searchBox').value.toLowerCase();
+        
+        // Filter data based on search
+        const filteredData = allData.filter(std => 
+            std.name.toLowerCase().includes(query) || std.id.toLowerCase().includes(query)
+        );
+
+        const start = currentPage * pageSize;
+        const pageData = filteredData.slice(start, start + pageSize);
+        const t = document.getElementById('selectTerm').value;
+
+        pageData.forEach((std, i) => {
+            const tr = document.createElement('tr');
+            const score = calculateValue(std);
+            tr.innerHTML = `
+                <td>${start+i+1}</td><td style="text-align:left">${std.name}</td><td>${std.sex}</td>
+                <td>${t==1?std.p1:''}</td><td>${t==1?std.p2:''}</td><td>${t==1?std.p3:''}</td><td>${t==1?std.p4:''}</td><td>${t==1?score:''}</td>
+                <td>${t==2?std.p1:''}</td><td>${t==2?std.p2:''}</td><td>${t==2?std.p3:''}</td><td>${t==2?std.p4:''}</td><td>${t==2?score:''}</td>
+                <td>${t==3?std.p1:''}</td><td>${t==3?std.p2:''}</td><td>${t==3?std.p3:''}</td><td>${t==3?score:''}</td>
+                <td></td>`;
+            viewBody.appendChild(tr);
+        });
+        document.getElementById('pageInfo').innerText = `Page ${currentPage + 1} of ${Math.ceil(filteredData.length/pageSize) || 1}`;
+    }
+
+    function calculateValue(std) {
+        const p1=parseFloat(std.p1)||0; const p2=parseFloat(std.p2)||0;
+        const p3=parseFloat(std.p3)||0; const p4=parseFloat(std.p4)||0;
+        const m1=parseFloat(document.getElementById('t1').value)||0;
+        const m2=parseFloat(document.getElementById('t2').value)||0;
+        const m3=parseFloat(document.getElementById('t3').value)||0;
+        const m4=parseFloat(document.getElementById('t4').value)||0;
+        let partA = (m1+m2+m3)>0 ? ((p1+p2+p3)/(m1+m2+m3))*40 : 0;
+        let partB = m4>0 ? (p4/m4)*60 : 0;
+        return Math.round(partA + partB);
+    }
+
+    function changePage(dir) {
+        const key = getStorageKey();
+        const query = document.getElementById('searchBox').value.toLowerCase();
+        const filteredLength = (masterData[key] || []).filter(std => 
+            std.name.toLowerCase().includes(query) || std.id.toLowerCase().includes(query)
+        ).length;
+        
+        const maxPage = Math.ceil(filteredLength / pageSize) - 1;
+        currentPage = Math.max(0, Math.min(currentPage + dir, maxPage));
+        updateView();
+    }
+
+    function updateScore(idx, field, el, key) {
+        masterData[key][idx][field] = el.value;
+        calcEntryRow(el.closest('tr'));
+    }
+
+    function calcEntryRow(row) {
+        const p1=parseFloat(row.querySelector('.p1').value)||0;
+        const p2=parseFloat(row.querySelector('.p2').value)||0;
+        const p3=parseFloat(row.querySelector('.p3').value)||0;
+        const p4=parseFloat(row.querySelector('.p4').value)||0;
+        const m1=parseFloat(document.getElementById('t1').value)||0;
+        const m2=parseFloat(document.getElementById('t2').value)||0;
+        const m3=parseFloat(document.getElementById('t3').value)||0;
+        const m4=parseFloat(document.getElementById('t4').value)||0;
+        let partA = (m1+m2+m3)>0 ? ((p1+p2+p3)/(m1+m2+m3))*40 : 0;
+        let partB = m4>0 ? (p4/m4)*60 : 0;
+        row.querySelector('.res').innerText = Math.round(partA + partB);
+    }
+
+    function getStorageKey() {
+        const f = document.getElementById('selectClass').value;
+        const t = document.getElementById('selectTerm').value;
+        const y = document.getElementById('selectYear').value;
+        const s = document.getElementById('selectSubject').value;
+        return `${f}-${t}-${y}-${s}`;
+    }
+
+    function getYearRosterKey() {
+        const f = document.getElementById('selectClass').value;
+        const y = document.getElementById('selectYear').value;
+        return `roster-${y}-Form${f}`;
+    }
+
+    async function saveToGitHub() {
+        const token = document.getElementById('ghToken').value;
+        if (!token) return alert("Enter Code");
+        const key = getStorageKey();
+        const rosterKey = getYearRosterKey();
+        const data = masterData[key] || [];
+        
+        let csvContent = "ID,Name,P1,P2,P3,P4,Sex\n";
+        data.forEach(s => { csvContent += `${s.id},${s.name},${s.p1},${s.p2},${s.p3},${s.p4},${s.sex}\n`; });
+        const encoded = btoa(unescape(encodeURIComponent(csvContent)));
+
+        for(let path of [key, rosterKey]) {
+            const url = `https://api.github.com/repos/magawass/ExApp/contents/${path}.csv`;
+            let sha = "";
+            const ck = await fetch(url, { headers: {'Authorization': `token ${token}`} });
+            if (ck.ok) { const d = await ck.json(); sha = d.sha; }
+            await fetch(url, {
+                method: 'PUT',
+                headers: {'Authorization': `token ${token}`, 'Content-Type': 'application/json'},
+                body: JSON.stringify({ message: `Update ${path}`, content: encoded, sha: sha })
+            });
+        }
+        alert("Wow! Saved successfully!");
+    }
+</script>
+</body>
+</html>
 
